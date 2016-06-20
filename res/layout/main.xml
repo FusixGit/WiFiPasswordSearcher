@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:weightSum="1">
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="4">
+        <Button
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:text="Refresh"
+                android:id="@+id/btnRefresh"/>
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:text="3WiFi"
+            android:enabled="false"
+            android:id="@+id/btnCheckFromBase" android:layout_gravity="center_horizontal"
+                />
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:text="GPS sniff (soon...)"
+            android:id="@+id/btnStartGPSLog" android:layout_gravity="center_horizontal"
+            android:enabled="false" android:textSize="12dp"/>
+    <ImageButton
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:id="@+id/btnSettings"
+            android:src="@android:drawable/ic_menu_preferences"
+            android:clickable="false" android:adjustViewBounds="false"/>
+    </LinearLayout>
+    <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/WiFiList"/>
+</LinearLayout>
+

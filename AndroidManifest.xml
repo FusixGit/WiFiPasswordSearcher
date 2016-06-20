@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.example.WiFiPasswordSearcher"
+          android:versionCode="5"
+          android:versionName="@string/app_version">
+    <uses-sdk android:minSdkVersion="14"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
+
+    <application android:label="@string/app_name"
+                 android:icon="@drawable/logo">
+        <activity android:name=".StartActivity"
+                  android:label="@string/app_name"
+                  android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".MyActivity"
+                  android:configChanges="keyboardHidden|orientation|screenSize">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.example.WiFiPasswordSearcher.StartActivity" />
+        </activity>
+        <activity android:name="SettingsActivity"
+                  android:configChanges="keyboardHidden|orientation|screenSize">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.example.WiFiPasswordSearcher.MyActivity" />
+        </activity>
+        <activity android:name="UserInfoActivity"
+                  android:configChanges="keyboardHidden|orientation|screenSize">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.example.WiFiPasswordSearcher.MyActivity" />
+        </activity>
+        <activity android:name="ServerSettingsActivity"
+                  android:configChanges="keyboardHidden|orientation|screenSize">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.example.WiFiPasswordSearcher.SettingsActivity" />
+        </activity>
+        <activity android:name="AboutActivity"
+                  android:configChanges="keyboardHidden|orientation|screenSize">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.example.WiFiPasswordSearcher.SettingsActivity" />
+        </activity>
+        <activity android:name="WifiDetails"
+                  android:configChanges="keyboardHidden|orientation|screenSize">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.example.WiFiPasswordSearcher.SettingsActivity" />
+        </activity>
+    </application>
+</manifest>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/row"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="100"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false">
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="75" android:weightSum="1">
+
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+            <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:id="@+id/imgSec"
+                    android:layerType="software"/>
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/imgWps"
+                android:layerType="software"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:layout_weight="0.77">
+                <TextView
+                    android:id="@+id/BSSID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00:00:00:00:00" android:textSize="14dp"
+                    android:layout_marginLeft="5dp"/>
+            <TextView
+                    android:id="@+id/ESSID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="WiFi ESSID" android:textSize="18dp" android:layout_marginLeft="20dp"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="10%"
+                        android:id="@+id/txtSignal" android:layout_marginLeft="5dp"/>
+            </LinearLayout>
+        </LinearLayout>
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/txtRowId"
+                android:clickable="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:editable="false"/>
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" android:layout_weight="29.58" android:weightSum="1">
+            <LinearLayout
+                    android:id="@+id/llKeys"
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent" android:weightSum="1" android:layout_weight="0.83">
+                <TextView
+                        android:id="@+id/KEY"
+                        android:layout_width="fill_parent"
+                        android:layout_height="40dp"
+                        android:text="WiFi key"
+                        android:textSize="14dp"
+                        android:layout_centerVertical="true" android:textIsSelectable="false"
+                        android:elegantTextHeight="false"
+                        android:ellipsize="none"
+                        android:maxLines="100"
+                        android:scrollHorizontally="false"/>
+                <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="12345678"
+
+                        android:textSize="14dp"
+                        android:id="@+id/txtWPS" android:layout_weight="0.1"/>
+
+            </LinearLayout>
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="3"
+                    android:id="@+id/txtKeysCount"
+                    android:textIsSelectable="false" android:gravity="center_vertical"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
