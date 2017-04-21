@@ -167,7 +167,7 @@ public class StartActivity extends Activity {
                 OutputStream os = Connection.getOutputStream();
                 DataOutputStream  writer = new DataOutputStream (
                         Connection.getOutputStream());
-                writer.writeBytes(URLEncoder.encode("Login=" + Login + "&Password=" + Password, "UTF-8"));
+                writer.writeBytes("Login=" + URLEncoder.encode(Login, "UTF-8") + "&Password=" + URLEncoder.encode(Password, "UTF-8"));
 
                 Connection.setReadTimeout(10 * 1000);
                 Connection.connect();
@@ -190,7 +190,7 @@ public class StartActivity extends Activity {
                         mSettings.Editor.putString(Settings.APP_SERVER_LOGIN, Login);
                         mSettings.Editor.putString(Settings.APP_SERVER_PASSWORD, Password);
                         mSettings.Editor.putString(Settings.API_READ_KEY, ReadApiKey);
-                        mSettings.Editor.putString(Settings.API_READ_KEY, WriteApiKey);
+                        mSettings.Editor.putString(Settings.API_WRITE_KEY, WriteApiKey);
                         mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, true);
                         mSettings.Editor.commit();
 

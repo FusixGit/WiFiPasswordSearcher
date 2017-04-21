@@ -19,14 +19,14 @@ public class AppVersion
 {
     private Context context;
     private String SERVER_URI;
-    private String ActualyVersion;
+    private Float ActualyVersion;
     private String WhatNews;
     private Boolean LoadSuccesses = false;
 
     public AppVersion(Context _context)
     {
         context = _context;
-        ActualyVersion = "";
+        ActualyVersion = 0f;
         WhatNews = "";
 
         Settings mSettings = new Settings(context);
@@ -83,7 +83,7 @@ public class AppVersion
                 LoadSuccesses = Successes;
                 if(LoadSuccesses)
                 {
-                    ActualyVersion = Json.getString("ActualyVersion");
+                    ActualyVersion = (float)Json.getDouble("ActualyVersion");
                     WhatNews = Json.getString("WhatNews");
                     return;
                 }
@@ -108,7 +108,8 @@ public class AppVersion
             return true;
         }
         if(!LoadSuccesses) return true;
-        if(context.getResources().getString(R.string.app_version).equals(ActualyVersion)) return true;
+        Float CurVersion = Float.parseFloat(context.getResources().getString(R.string.app_version));
+        if(CurVersion >= ActualyVersion) return true;
         return false;
     }
 }

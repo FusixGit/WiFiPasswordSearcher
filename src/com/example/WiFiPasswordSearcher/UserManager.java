@@ -16,6 +16,7 @@ import java.net.URL;
 public class UserManager {
     Context context = null;
     private Settings mSettings = null;
+    private String APP_VERSION = "";
     private String SERVER_URI = "";
     private String API_READ_KEY = "";
 
@@ -28,6 +29,7 @@ public class UserManager {
     public Integer LastUpdate = 0;
 
     UserManager(Context context) {
+        APP_VERSION = context.getResources().getString(R.string.app_version);
         mSettings = new Settings(context);
         SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, "http://3wifi.stascorp.com");
         API_READ_KEY = mSettings.AppSettings.getString(Settings.API_READ_KEY, "");
@@ -51,7 +53,9 @@ public class UserManager {
 
     public boolean getFromSite()
     {
-        String Args = "/api/ajax.php?Version=0.5&Query=GetUserInfo&Key="+API_READ_KEY;
+        if(API_READ_KEY == "")
+            API_READ_KEY = mSettings.AppSettings.getString(Settings.API_READ_KEY, "");
+        String Args = "/api/ajax.php?Version="+APP_VERSION+"&Query=GetUserInfo&Key="+API_READ_KEY;
         BufferedReader Reader = null;
         String ReadLine = "";
         String RawData = "";
