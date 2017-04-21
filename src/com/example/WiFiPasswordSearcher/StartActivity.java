@@ -71,7 +71,7 @@ public class StartActivity extends Activity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        AppVersion Version = new AppVersion(getApplicationContext());
+                        final AppVersion Version = new AppVersion(getApplicationContext());
                         Boolean Result = Version.isActualyVersion();
                         if(!Result)
                         {
@@ -96,7 +96,7 @@ public class StartActivity extends Activity {
         btnGetKeys.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProgressDialog dProccess = new ProgressDialog(StartActivity.this);
+                final ProgressDialog dProccess = new ProgressDialog(StartActivity.this);
                 dProccess.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 dProccess.setMessage("Logging...");
                 dProccess.setCanceledOnTouchOutside(false);
@@ -198,7 +198,7 @@ public class StartActivity extends Activity {
                     }else {
                         JSONObject error = Json.getJSONObject("Error");
                         if (error != null) {
-                            String errorDesc = error.getString("Desc");
+                            final String errorDesc = error.getString("Desc");
                             Integer errorCode = error.getInt("Code");
 
                             if(errorDesc != null)

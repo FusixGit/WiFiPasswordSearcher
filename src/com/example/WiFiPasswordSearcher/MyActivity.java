@@ -210,7 +210,7 @@ class WiFiListSimpleAdapter extends SimpleAdapter
 
             LinearLayout llRow = (LinearLayout)v.getParent().getParent();
             TextView txtRowId = (TextView)llRow.findViewById(R.id.txtRowId);
-            int rowId = Integer.parseInt(txtRowId.getText().toString());
+            final int rowId = Integer.parseInt(txtRowId.getText().toString());
 
             ArrayList<String> keys = MyActivity.WiFiKeys.get(rowId).Keys;
             ArrayList<String> wpss = MyActivity.WiFiKeys.get(rowId).WPS;
@@ -340,7 +340,7 @@ public class MyActivity extends Activity {
             if(ScanInProcess) return;
             if(WiFiKeys != null) WiFiKeys.clear();
 
-            ProgressDialog dProccess = new ProgressDialog(MyActivity.this);
+            final ProgressDialog dProccess = new ProgressDialog(MyActivity.this);
             dProccess.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             dProccess.setMessage("Searching in 3WiFi...");
             dProccess.setCanceledOnTouchOutside(false);
@@ -380,7 +380,7 @@ public class MyActivity extends Activity {
     public AdapterView.OnItemClickListener WiFiListOnClick = new AdapterView.OnItemClickListener()
     {
         @Override
-        public void onItemClick(AdapterView<?> parent, View linearLayout, int position, long id)
+        public void onItemClick(AdapterView<?> parent, View linearLayout, int position, final long id)
         {
             LinearLayout item = (LinearLayout)linearLayout;
             lastWiFiClickItem = item;
@@ -597,7 +597,7 @@ public class MyActivity extends Activity {
     {
         WiFiScanResult = null;
         adapter = null;
-        ProgressDialog dProccess = new ProgressDialog(MyActivity.this);
+        final ProgressDialog dProccess = new ProgressDialog(MyActivity.this);
         dProccess.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dProccess.setMessage("Scan...");
         dProccess.setCanceledOnTouchOutside(false);

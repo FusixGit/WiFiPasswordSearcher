@@ -186,7 +186,7 @@ public class WifiDetails extends Activity
         BSSID = BSSID.toUpperCase();
         if(BSSID == LastBSSID) return;
 
-        String text = "BSSID: " + BSSID;
+        final String text = "BSSID: " + BSSID;
 
         runOnUiThread(new Runnable() {
             @Override
@@ -197,7 +197,7 @@ public class WifiDetails extends Activity
         LastBSSID = BSSID;
     }
 
-    private void setESSID(String ESSID)
+    private void setESSID(final String ESSID)
     {
         if(ESSID == LastESSID) return;
 
@@ -248,7 +248,7 @@ public class WifiDetails extends Activity
             sDiap = "";
         }
 
-        String sText = "Freq: " + Freq + " MHz " + "( " + sDiap + " )";
+        final String sText = "Freq: " + Freq + " MHz " + "( " + sDiap + " )";
 
         runOnUiThread(new Runnable() {
             @Override
@@ -263,7 +263,7 @@ public class WifiDetails extends Activity
 
     private void setSignal(String Signal)
     {
-        int iSignal = 100 + Integer.parseInt(Signal);
+        final int iSignal = 100 + Integer.parseInt(Signal);
         LastSignal = iSignal;
 
         runOnUiThread(new Runnable() {
@@ -275,7 +275,7 @@ public class WifiDetails extends Activity
             }
         });
     }
-    private void setChannel(int Channel)
+    private void setChannel(final int Channel)
     {
         runOnUiThread(new Runnable() {
             @Override
