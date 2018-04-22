@@ -1,81 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent" android:weightSum="1">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:weightSum="1">
 
-    <ImageView
-            android:layout_width="170dp"
-            android:layout_height="170dp"
-            android:id="@+id/imageView" android:layout_gravity="center_horizontal"
-            android:src="@drawable/logo"/>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/empty"/>
-    <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="For work needed API keys!"
-            android:id="@+id/textView2" android:gravity="center_horizontal"/>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/empty2"/>
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:weightSum="1">
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="3WiFi login:"
-                android:id="@+id/txtLogin" android:layout_weight="1.00"/>
-        <EditText
-                android:layout_width="175dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/edtLogin" android:maxLines="1"
-                android:singleLine="true"/>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:weightSum="1">
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="3WiFi password:"
-            android:id="@+id/txtPassword" android:layout_weight="1.00"/>
-    <EditText
-            android:layout_width="175dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/edtPassword" android:password="true" android:maxLines="1"
-            android:singleLine="true"/>
+	<ImageView
+		android:layout_width="170dp"
+		android:layout_height="170dp"
+		android:id="@+id/imageView"
+		android:layout_gravity="center_horizontal"
+		android:src="@drawable/logo"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="30dp"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:id="@+id/empty"/>
+
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:text="For work needed API keys!"
+		android:id="@+id/textView2"
+		android:gravity="center_horizontal"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="30dp"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:id="@+id/empty2"/>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:weightSum="1">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:text="3WiFi login:"
+			android:id="@+id/txtLogin"
+			android:layout_weight="1.00"/>
+
+		<EditText
+			android:layout_width="175dp"
+			android:layout_height="wrap_content"
+			android:id="@+id/edtLogin"
+			android:maxLines="1"
+			android:singleLine="true"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:weightSum="1">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:text="3WiFi password:"
+			android:id="@+id/txtPassword"
+			android:layout_weight="1.00"/>
+
+		<EditText
+			android:layout_width="175dp"
+			android:layout_height="wrap_content"
+			android:id="@+id/edtPassword"
+			android:password="true"
+			android:maxLines="1"
+			android:singleLine="true"/>
+
+	</LinearLayout>
+
+	<Button
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="Get keys!"
+		android:id="@+id/btnGetApiKeys"
+		android:layout_gravity="center_horizontal"
+		android:visibility="visible"/>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:weightSum="1"
+		android:id="@+id/llStartMenu"
+		android:visibility="gone">
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Start!"
+			android:id="@+id/btnStart"
+			android:layout_weight="0.85"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="User info"
+			android:id="@+id/btnUserInfo"
+			android:layout_weight="0.15"/>
+
+	</LinearLayout>
+
 </LinearLayout>
-    <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Get keys!"
-            android:id="@+id/btnGetApiKeys" android:layout_gravity="center_horizontal" android:visibility="visible"/>
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:weightSum="1"
-            android:id="@+id/llStartMenu" android:visibility="gone">
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Start!"
-                android:id="@+id/btnStart" android:layout_weight="0.85"/>
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="User info"
-                android:id="@+id/btnUserInfo" android:layout_weight="0.15"/>
-    </LinearLayout>
-</LinearLayout>
+
