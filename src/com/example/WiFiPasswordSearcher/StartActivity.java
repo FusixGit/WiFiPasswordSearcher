@@ -18,7 +18,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 /**
- * Created by οκ on 20.12.2015.
+ * Created by ΠΏΠΊ on 20.12.2015.
  */
 public class StartActivity extends Activity {
 

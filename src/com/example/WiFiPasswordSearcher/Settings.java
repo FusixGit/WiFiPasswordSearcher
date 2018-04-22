@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 
 /**
- * Created by οκ on 19.11.2015.
+ * Created by ΠΏΠΊ on 19.11.2015.
  */
 public class Settings
 {

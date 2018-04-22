@@ -11,7 +11,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 /**
- * Created by οκ on 20.12.2015.
+ * Created by ΠΏΠΊ on 20.12.2015.
  */
 public class UserManager {
     Context context = null;

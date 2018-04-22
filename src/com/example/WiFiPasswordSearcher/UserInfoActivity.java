@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 /**
- * Created by οκ on 20.12.2015.
+ * Created by ΠΏΠΊ on 20.12.2015.
  */
 public class UserInfoActivity extends Activity {
 
