@@ -483,7 +483,17 @@ public class MyActivity extends Activity {
                             }
                             else
                             {
-                                WifiCfg.preSharedKey = String.format("\"%s\"", (apdata.Keys.get(0)).substring(15));
+                                try
+                                {
+                                    WifiCfg.preSharedKey = String.format("\"%s\"", (apdata.Keys.get(0)).substring(15));
+                                }
+                                catch (Exception e)
+                                {
+                                    Toast toast = Toast.makeText(getApplicationContext(),
+                                            "Key not found", Toast.LENGTH_SHORT);
+                                    toast.show();
+                                    break;
+                                }
                             }
 
                             int netId = WifiMgr.addNetwork(WifiCfg);
