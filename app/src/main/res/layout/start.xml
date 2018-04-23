@@ -31,14 +31,16 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:gravity="right"
 			android:textAppearance="?android:attr/textAppearanceLarge"
 			android:text="Username:"
 			android:id="@+id/txtLogin"
 			android:layout_weight="1.00"/>
 
 		<EditText
-			android:layout_width="175dp"
+			android:layout_width="240dp"
 			android:layout_height="wrap_content"
+			android:layout_marginLeft="12dp"
 			android:id="@+id/edtLogin"
 			android:maxLines="1"
 			android:singleLine="true"/>
@@ -54,14 +56,16 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:gravity="right"
 			android:textAppearance="?android:attr/textAppearanceLarge"
 			android:text="Password:"
 			android:id="@+id/txtPassword"
 			android:layout_weight="1.00"/>
 
 		<EditText
-			android:layout_width="175dp"
+			android:layout_width="240dp"
 			android:layout_height="wrap_content"
+			android:layout_marginLeft="12dp"
 			android:id="@+id/edtPassword"
 			android:password="true"
 			android:maxLines="1"
