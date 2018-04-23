@@ -604,8 +604,9 @@ public class MyActivity extends Activity {
         if (ScanInProcess)
         {
          //   if(ScanWiFiReceiverIntent != null) unregisterReceiver(ScanWiFiReceiverIntent);
-            ScanAndShowWiFi();
+            //ScanAndShowWiFi();
         }
+        ScanAndShowWiFi();
     }
 
     public void ScanAndShowWiFi()
