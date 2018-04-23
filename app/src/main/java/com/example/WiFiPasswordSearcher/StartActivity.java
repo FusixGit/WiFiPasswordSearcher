@@ -98,7 +98,7 @@ public class StartActivity extends Activity {
             public void onClick(View v) {
                 final ProgressDialog dProccess = new ProgressDialog(StartActivity.this);
                 dProccess.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                dProccess.setMessage("Logging...");
+                dProccess.setMessage("Signing in...");
                 dProccess.setCanceledOnTouchOutside(false);
                 dProccess.show();
 

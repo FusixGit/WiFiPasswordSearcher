@@ -600,7 +600,7 @@ public class MyActivity extends Activity {
         adapter = null;
         final ProgressDialog dProccess = new ProgressDialog(MyActivity.this);
         dProccess.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dProccess.setMessage("Scan...");
+        dProccess.setMessage("Scanning networks...");
         dProccess.setCanceledOnTouchOutside(false);
         dProccess.show();
 
