@@ -4,6 +4,7 @@ package com.example.WiFiPasswordSearcher;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.ActionBar;
 import android.content.*;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -559,6 +560,8 @@ public class MyActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        ActionBar actionBar = getActionBar();
+        actionBar.hide();
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
