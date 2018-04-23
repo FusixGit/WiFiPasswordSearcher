@@ -7,7 +7,6 @@ import android.media.SoundPool;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -53,7 +52,6 @@ public class WifiDetails extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.wifi_details);
 
 
@@ -110,7 +108,7 @@ public class WifiDetails extends Activity
         setFreq(StartWifiInfo.get("Freq"));
         setSignal(StartWifiInfo.get("Signal"));
 
-        WifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         ScanThread = new Thread(new Runnable() {
             @Override
