@@ -32,7 +32,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textAppearance="?android:attr/textAppearanceLarge"
-			android:text="3WiFi login:"
+			android:text="Username:"
 			android:id="@+id/txtLogin"
 			android:layout_weight="1.00"/>
 
@@ -55,7 +55,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textAppearance="?android:attr/textAppearanceLarge"
-			android:text="3WiFi password:"
+			android:text="Password:"
 			android:id="@+id/txtPassword"
 			android:layout_weight="1.00"/>
 

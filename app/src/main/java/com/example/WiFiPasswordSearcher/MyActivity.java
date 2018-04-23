@@ -300,7 +300,12 @@ public class MyActivity extends Activity {
     private static WiFiListSimpleAdapter adapter = null;
 
     private static final String[] listContextMenuItems = new String[]{
-           "Details", "Copy ESSID", "Copy BSSID", "Copy key", "Add network", "Generate WPS PIN"
+        "Network details",
+        "Copy ESSID",
+        "Copy BSSID",
+        "Copy network key",
+        "Store network profile",
+        "Generate WPS PIN"
     };
 
     public void btnRefreshOnClick(View v)
