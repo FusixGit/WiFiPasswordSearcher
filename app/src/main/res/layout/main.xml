@@ -16,7 +16,8 @@
 			android:layout_width="100dp"
 			android:layout_height="50dp"
 			android:text="Refresh"
-			android:id="@+id/btnRefresh"/>
+			android:id="@+id/btnRefresh"
+			android:onClick="btnRefreshOnClick"/>
 
 		<Button
 			android:layout_width="100dp"

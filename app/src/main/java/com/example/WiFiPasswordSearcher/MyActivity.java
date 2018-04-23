@@ -298,23 +298,20 @@ public class MyActivity extends Activity {
            "Details", "Copy ESSID", "Copy BSSID", "Copy key", "Add network"
     };
 
-    private View.OnClickListener btnRefreshOnClick = new View.OnClickListener()
+    public void btnRefreshOnClick(View v)
     {
-        public void onClick(View v)
-        {
-            if (ScanInProcess) return;
+        if (ScanInProcess) return;
 
-            if (WiFiKeys != null) WiFiKeys.clear();
-            if (WiFiScanResult != null) WiFiScanResult.clear();
+        if (WiFiKeys != null) WiFiKeys.clear();
+        if (WiFiScanResult != null) WiFiScanResult.clear();
 
-            Context context = getApplicationContext();
-            ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
-            SimpleAdapter adapter = new SimpleAdapter(context, list, R.layout.row,
-                new String[]{"ESSID", "BSSID"},
-                new int[]{R.id.ESSID, R.id.BSSID});
-            WiFiList.setAdapter(adapter);
-            ScanAndShowWiFi();
-        }
+        Context context = getApplicationContext();
+        ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+        SimpleAdapter adapter = new SimpleAdapter(context, list, R.layout.row,
+            new String[]{"ESSID", "BSSID"},
+            new int[]{R.id.ESSID, R.id.BSSID});
+        WiFiList.setAdapter(adapter);
+        ScanAndShowWiFi();
     };
 
     private View.OnClickListener btnSettingsOnClick = new View.OnClickListener()
@@ -589,7 +586,6 @@ public class MyActivity extends Activity {
         LocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         sClipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 
-        btnRefresh.setOnClickListener(btnRefreshOnClick);
         btnCheckFromBase.setOnClickListener(btnCheckFromBaseOnClick);
         btnStartGPSLog.setOnClickListener(btnStartGPSLogOnClick);
         btnSettings.setOnClickListener(btnSettingsOnClick);
