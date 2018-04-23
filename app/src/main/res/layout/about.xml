@@ -22,17 +22,31 @@
 		android:gravity="center">
 
 		<TextView
-			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textAppearance="?android:attr/textAppearanceMedium"
-			android:id="@+id/editText2" android:text="App version: "/>
+			android:text="• 3WiFi - Stas'M  |  Locator - Fusix  |  WPS - RUSHCOW •"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:layout_width="wrap_content"/>
 
-		<TextView
-			android:layout_width="match_parent"
+		<LinearLayout
 			android:layout_height="wrap_content"
-			android:id="@+id/editText3"
-			android:textAppearance="?android:attr/textAppearanceMedium"
-			android:text="@string/app_version"/>
+			android:layout_width="wrap_content"
+			android:orientation="horizontal">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:id="@+id/editText2"
+				android:text="App version: "/>
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/editText3"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:text="@string/app_version"/>
+
+		</LinearLayout>
 
 	</LinearLayout>
 

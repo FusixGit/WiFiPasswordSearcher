@@ -300,7 +300,7 @@ public class MyActivity extends Activity {
     private static WiFiListSimpleAdapter adapter = null;
 
     private static final String[] listContextMenuItems = new String[]{
-           "Details", "Copy ESSID", "Copy BSSID", "Copy key", "Add network"
+           "Details", "Copy ESSID", "Copy BSSID", "Copy key", "Add network", "Generate WPS PIN"
     };
 
     public void btnRefreshOnClick(View v)
@@ -398,6 +398,8 @@ public class MyActivity extends Activity {
             View dialogView = MyActivity.this.getLayoutInflater().inflate(R.layout.listclick_contextmenu, null);
 
             dialogBuilder.setTitle(txtESSID.getText());
+            final String ESSDWps = txtESSID.getText().toString();
+            final String BSSDWps = txtBSSID.getText().toString();
 
             dialogBuilder.setItems(listContextMenuItems, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item)
@@ -506,6 +508,12 @@ public class MyActivity extends Activity {
                                         "Network added!", Toast.LENGTH_SHORT);
                                 toast.show();
                             }
+                            break;
+                        case 5:         // wps
+                            Intent wpsActivityIntent = new Intent(MyActivity.this, WPSActivity.class);
+                            wpsActivityIntent.putExtra("variable", ESSDWps);
+                            wpsActivityIntent.putExtra("variable1", BSSDWps);
+                            startActivity(wpsActivityIntent);
                             break;
                     }
 
