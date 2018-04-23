@@ -444,7 +444,7 @@ public class MyActivity extends Activity {
                                 return;
                             }
 
-                            dataClip = ClipData.newPlainText("text", apdata.Keys.get(0));
+                            dataClip = ClipData.newPlainText("text", (apdata.Keys.get(0)).substring(15));
                             sClipboard.setPrimaryClip(dataClip);
                             NeedToast = true;
                             break;
@@ -478,12 +478,12 @@ public class MyActivity extends Activity {
                                 WifiCfg.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
                                 WifiCfg.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
 
-                                WifiCfg.wepKeys[0] = String.format("\"%s\"", apdata.Keys.get(0));
+                                WifiCfg.wepKeys[0] = String.format("\"%s\"", (apdata.Keys.get(0)).substring(15));
                                 WifiCfg.wepTxKeyIndex = 0;
                             }
                             else
                             {
-                                WifiCfg.preSharedKey = String.format("\"%s\"", apdata.Keys.get(0));
+                                WifiCfg.preSharedKey = String.format("\"%s\"", (apdata.Keys.get(0)).substring(15));
                             }
 
                             int netId = WifiMgr.addNetwork(WifiCfg);
