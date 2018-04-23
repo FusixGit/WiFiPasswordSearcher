@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.text.style.*;
+
 
 class APData
 {
@@ -85,16 +87,19 @@ class WiFiListSimpleAdapter extends SimpleAdapter
                     switch (value)
                     {
                         case "red":
-                            txtView.setTextColor(Color.RED);
+                            txtView.setTextColor(Color.rgb(153, 0, 0));
                             break;
                         case "green":
                             txtView.setTextColor(Color.GREEN);
+                            break;
+                        case "greendark":
+                            txtView.setTextColor(Color.rgb(0, 153, 76));
                             break;
                         case "blue":
                             txtView.setTextColor(Color.BLUE);
                             break;
                         case "yellow":
-                            txtView.setTextColor(Color.YELLOW);
+                            txtView.setTextColor(Color.rgb(153, 153, 0));
                             break;
                         case "gray":
                             txtView.setTextColor(Color.rgb(105, 105, 105));

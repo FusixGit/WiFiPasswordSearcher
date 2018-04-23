@@ -8,7 +8,7 @@
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="0dp"
-		android:layout_height="70dp"
+		android:layout_height="63dp"
 		android:layout_weight="100"
 		android:clickable="false"
 		android:focusable="false"
@@ -51,24 +51,26 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="00:00:00:00:00:00"
-					android:textSize="14dp"
-					android:layout_marginLeft="5dp"/>
+					android:textSize="12dp"
+					android:layout_marginLeft="5dp"
+					android:textColor="#7D7D7D"/>
 
 				<TextView
 					android:id="@+id/ESSID"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="WiFi ESSID"
-					android:textSize="18dp"
-					android:layout_marginLeft="20dp"/>
+					android:textSize="19dp"
+					android:layout_marginLeft="20dp"
+					android:textStyle="bold"/>
 
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textAppearance="?android:attr/textAppearanceSmall"
 					android:text="10%"
 					android:id="@+id/txtSignal"
-					android:layout_marginLeft="5dp"/>
+					android:layout_marginLeft="5dp"
+					android:textSize="12sp"/>
 
 			</LinearLayout>
 
@@ -129,7 +131,8 @@
 				android:text="3"
 				android:id="@+id/txtKeysCount"
 				android:textIsSelectable="false"
-				android:gravity="center_vertical"/>
+				android:gravity="center_vertical"
+				android:paddingRight="21dp"/>
 
 		</LinearLayout>
 

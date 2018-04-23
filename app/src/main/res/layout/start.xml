@@ -4,34 +4,23 @@
 	android:orientation="vertical"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:weightSum="1">
+	android:weightSum="1"
+	android:gravity="center_vertical">
 
 	<ImageView
-		android:layout_width="170dp"
-		android:layout_height="170dp"
+		android:layout_width="150dp"
+		android:layout_height="130dp"
 		android:id="@+id/imageView"
 		android:layout_gravity="center_horizontal"
 		android:src="@drawable/logo"/>
 
 	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="30dp"
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:id="@+id/empty"/>
-
-	<TextView
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:text="This app requires API keys!"
 		android:id="@+id/textView2"
-		android:gravity="center_horizontal"/>
-
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="30dp"
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:id="@+id/empty2"/>
+		android:gravity="center_horizontal"
+		android:padding="20dp"/>
 
 	<LinearLayout
 		android:orientation="horizontal"
@@ -111,6 +100,12 @@
 			android:layout_weight="0.15"/>
 
 	</LinearLayout>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:orientation="horizontal"
+		android:padding="50dp"/>
 
 </LinearLayout>
 
