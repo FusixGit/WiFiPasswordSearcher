@@ -32,13 +32,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import android.text.style.*;
 
 
 class APData
 {
     public String BSSID;
     public ArrayList<String> Keys;
+    public ArrayList<Boolean> Generated;
     public ArrayList<String> WPS;
 }
 
@@ -251,14 +251,28 @@ class WiFiListSimpleAdapter extends SimpleAdapter
     private void passwordChoose(int rowID, int passId)
     {
         ArrayList<String> keys = MyActivity.WiFiKeys.get(rowID).Keys;
+        ArrayList<Boolean> gen = MyActivity.WiFiKeys.get(rowID).Generated;
+        ArrayList<String> wps = MyActivity.WiFiKeys.get(rowID).WPS;
         String choosedPassword = keys.get(passId);
+        Boolean isGen = gen.get(passId);
+        String curWPS = wps.get(passId);
+        String KeyColor;
+
         keys.set(passId, keys.get(0));
         keys.set(0, choosedPassword);
+        gen.set(passId, gen.get(0));
+        gen.set(0, isGen);
+        wps.set(passId, wps.get(0));
+        wps.set(0, curWPS);
 
         View row = MyActivity.WiFiList.getChildAt(rowID);
         TextView txtKey = (TextView)row.findViewById(R.id.KEY);
-        txtKey.setText(choosedPassword);
+        KeyColor = (isGen ? "*[color:red]*" : "*[color:green]*");
+        txtKey.setText(KeyColor + choosedPassword);
         ParseInTextTags(txtKey);
+        TextView txtWPS = (TextView)row.findViewById(R.id.txtWPS);
+        txtWPS.setText(curWPS == "" ? "*[color:gray]*[unknown]" : "*[color:blue]*" + curWPS);
+        ParseInTextTags(txtWPS);
     }
 }
 
@@ -454,7 +468,7 @@ public class MyActivity extends Activity {
                                 return;
                             }
 
-                            dataClip = ClipData.newPlainText("text", (apdata.Keys.get(0)).substring(15));
+                            dataClip = ClipData.newPlainText("text", apdata.Keys.get(0));
                             sClipboard.setPrimaryClip(dataClip);
                             NeedToast = true;
                             break;
@@ -488,14 +502,14 @@ public class MyActivity extends Activity {
                                 WifiCfg.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
                                 WifiCfg.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
 
-                                WifiCfg.wepKeys[0] = String.format("\"%s\"", (apdata.Keys.get(0)).substring(15));
+                                WifiCfg.wepKeys[0] = String.format("\"%s\"", apdata.Keys.get(0));
                                 WifiCfg.wepTxKeyIndex = 0;
                             }
                             else
                             {
                                 try
                                 {
-                                    WifiCfg.preSharedKey = String.format("\"%s\"", (apdata.Keys.get(0)).substring(15));
+                                    WifiCfg.preSharedKey = String.format("\"%s\"", apdata.Keys.get(0));
                                 }
                                 catch (Exception e)
                                 {
@@ -685,6 +699,7 @@ public class MyActivity extends Activity {
     {
         ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
         HashMap<String, String> ElemWiFi;
+        String KeyColor;
         int i = 0;
         for (ScanResult result : WiFiScanResult) {
             APData apdata = GetWiFiKeyByBSSID(result.SSID, result.BSSID);
@@ -701,11 +716,12 @@ public class MyActivity extends Activity {
                 ElemWiFi.put("KEYSCOUNT", "*[color:gray]*" + Integer.toString(apdata.Keys.size()));
 
             } else {
-                ElemWiFi.put("KEY", apdata.Keys.get(0));
+                KeyColor = (apdata.Generated.get(0) ? "*[color:red]*" : "*[color:green]*");
+                ElemWiFi.put("KEY", KeyColor + apdata.Keys.get(0));
                 ElemWiFi.put("KEYSCOUNT", "*[color:green]*" + Integer.toString(apdata.Keys.size()));
             }
 
-            if (apdata.WPS.size() < 1)
+            if (apdata.WPS.size() < 1 || apdata.WPS.get(0) == "")
             {
                 ElemWiFi.put("WPS", "*[color:gray]*[unknown]");
             }
@@ -768,6 +784,7 @@ public class MyActivity extends Activity {
         }
 
         ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<Boolean> gen = new ArrayList<Boolean>();
         ArrayList<String> wpsPins = new ArrayList<String>();
 
         try {
@@ -780,7 +797,8 @@ public class MyActivity extends Activity {
 
                 for (int i = 0; i < keysJSON.length(); i++)
                 {
-                    keys.add("*[color:green]*" + keysJSON.getString(i));
+                    keys.add(keysJSON.getString(i));
+                    gen.add(false);
                     if (JsonWPSPins.getInt(i) == -1) wpsPins.add("");
                     else wpsPins.add(Integer.toString(JsonWPSPins.getInt(i)));
                 }
@@ -810,12 +828,18 @@ public class MyActivity extends Activity {
         if (keys.size() == 0)
         {
             String PassiveKey = PassiveVulnerabilityTest(ESSID, BSSID);
-            if (PassiveKey != "") keys.add(PassiveKey);
+            if (PassiveKey != "")
+            {
+                keys.add(PassiveKey);
+                gen.add(true);
+                wpsPins.add("");
+            }
         }
 
         APData apdata = new APData();
         apdata.BSSID = BSSID;
         apdata.Keys = keys;
+        apdata.Generated = gen;
         apdata.WPS = wpsPins;
 
         return apdata;
@@ -830,7 +854,6 @@ public class MyActivity extends Activity {
             {
                 ret = BSSID.replace(":", "");
                 ret = ret.substring(4, 12);
-                ret = "*[color:red]*"+ret;
             }
         }
         return ret;
