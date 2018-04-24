@@ -3,6 +3,7 @@ package com.example.WiFiPasswordSearcher;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +39,7 @@ public class StartActivity extends Activity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start);
+        this.onConfigurationChanged(getResources().getConfiguration());
 
         mSettings = new Settings(getApplicationContext());
         User = new UserManager(getApplicationContext());
@@ -147,6 +149,25 @@ public class StartActivity extends Activity {
                 return;
             }
         });
+    }
+
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+
+        LinearLayout LR = (LinearLayout)findViewById(R.id.rootLayout);
+        LinearLayout LP = (LinearLayout)findViewById(R.id.layoutPadding);
+
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            LR.setOrientation(LinearLayout.VERTICAL);
+            LP.setVisibility(View.VISIBLE);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+        {
+            LR.setOrientation(LinearLayout.HORIZONTAL);
+            LP.setVisibility(View.GONE);
+        }
     }
 
     private boolean getApiKeys(String Login, String Password) throws IOException
