@@ -476,7 +476,7 @@ public class MyActivity extends Activity {
                             if (WiFiKeys.isEmpty()) break;
 
                             apdata = WiFiKeys.get((int)id);
-                            if (apdata == null)
+                            if (apdata == null || apdata.Keys.size() < 1)
                             {
                                 Toast toast = Toast.makeText(getApplicationContext(),
                                         "Key not found!", Toast.LENGTH_SHORT);
@@ -507,17 +507,7 @@ public class MyActivity extends Activity {
                             }
                             else
                             {
-                                try
-                                {
-                                    WifiCfg.preSharedKey = String.format("\"%s\"", apdata.Keys.get(0));
-                                }
-                                catch (Exception e)
-                                {
-                                    Toast toast = Toast.makeText(getApplicationContext(),
-                                            "Key not found", Toast.LENGTH_SHORT);
-                                    toast.show();
-                                    break;
-                                }
+                                WifiCfg.preSharedKey = String.format("\"%s\"", apdata.Keys.get(0));
                             }
 
                             int netId = WifiMgr.addNetwork(WifiCfg);
