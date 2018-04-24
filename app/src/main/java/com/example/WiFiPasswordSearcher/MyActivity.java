@@ -600,7 +600,7 @@ public class MyActivity extends Activity {
         btnSettings = (ImageButton) findViewById(R.id.btnSettings);
         btnStartGPSLog = (Button) findViewById(R.id.btnStartGPSLog);
 
-        WifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         LocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         sClipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 
