@@ -2,11 +2,14 @@ package com.example.WiFiPasswordSearcher;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -53,7 +56,7 @@ public class WifiDetails extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wifi_details);
-
+        this.onConfigurationChanged(getResources().getConfiguration());
 
         HashMap<String, String> WifiInfoIntent;
 
@@ -118,6 +121,29 @@ public class WifiDetails extends Activity
         });
         ScanThreadActive = true;
         ScanThread.start();
+    }
+
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+
+        LinearLayout LR = (LinearLayout)findViewById(R.id.rootLayout);
+        LinearLayout LI = (LinearLayout)findViewById(R.id.layoutInfo);
+
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            LR.setOrientation(LinearLayout.VERTICAL);
+            ViewGroup.LayoutParams layoutParams = LI.getLayoutParams();
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            LI.setLayoutParams(layoutParams);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+        {
+            LR.setOrientation(LinearLayout.HORIZONTAL);
+            ViewGroup.LayoutParams layoutParams = LI.getLayoutParams();
+            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            LI.setLayoutParams(layoutParams);
+        }
     }
 
     protected void onDestroy()
