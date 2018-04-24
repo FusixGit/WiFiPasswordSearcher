@@ -456,7 +456,14 @@ public class MyActivity extends Activity {
                             NeedToast = true;
                             break;
                         case 3:         // Copy Key
-                            if (WiFiKeys.isEmpty()) break;
+                            if (WiFiKeys.isEmpty())
+                            {
+                                Toast toast = Toast.makeText(getApplicationContext(),
+                                        "No data here! Click 3WiFi button to fetch some keys.",
+                                        Toast.LENGTH_LONG);
+                                toast.show();
+                                break;
+                            }
 
                             apdata = WiFiKeys.get((int)id);
 
@@ -473,7 +480,14 @@ public class MyActivity extends Activity {
                             NeedToast = true;
                             break;
                         case 4:         // Add network
-                            if (WiFiKeys.isEmpty()) break;
+                            if (WiFiKeys.isEmpty())
+                            {
+                                Toast toast = Toast.makeText(getApplicationContext(),
+                                        "No data here! Click 3WiFi button to fetch some keys.",
+                                        Toast.LENGTH_LONG);
+                                toast.show();
+                                break;
+                            }
 
                             apdata = WiFiKeys.get((int)id);
                             if (apdata == null || apdata.Keys.size() < 1)
