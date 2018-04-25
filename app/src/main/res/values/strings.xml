@@ -10,6 +10,7 @@
         <item>Locator Settings</item>
         <item>About</item>
         <item>Check updates</item>
+        <item>Logout</item>
     </string-array>
 
 </resources>
