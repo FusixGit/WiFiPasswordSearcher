@@ -89,7 +89,7 @@ public class WPSActivity extends Activity
 			catch (Exception e)
 			{}
 
-			HttpGet http = new HttpGet("http://3wifi.stascorp.com/api/apiwps?key=" + API_READ_KEY + "&bssid=" + BSSID);
+			HttpGet http = new HttpGet(SERVER_URI + "/api/apiwps?key=" + API_READ_KEY + "&bssid=" + BSSID);
 			try
 			{
 				response = hc.execute(http, res);
