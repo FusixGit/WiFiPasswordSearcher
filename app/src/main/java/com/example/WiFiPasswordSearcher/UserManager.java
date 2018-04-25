@@ -14,7 +14,6 @@ import java.net.URL;
  * Created by пк on 20.12.2015.
  */
 public class UserManager {
-    Context context = null;
     private Settings mSettings = null;
     private String APP_VERSION = "";
     private String SERVER_URI = "";
@@ -23,10 +22,7 @@ public class UserManager {
     public String Login = "";
     public String NickName = "";
     public String RegDate = "";
-    public String InviterNickName = "";
-    public Integer Level = -2;
-    public Integer InvCount = 0;
-    public Integer LastUpdate = 0;
+    public Integer Level = -1;
 
     UserManager(Context context) {
         APP_VERSION = context.getResources().getString(R.string.app_version);
@@ -36,82 +32,11 @@ public class UserManager {
         Login = mSettings.AppSettings.getString(Settings.APP_SERVER_LOGIN, "");
     }
 
-    public boolean isActualyData()
-    {
-        if(LastUpdate > 0) return true;
-        return false;
-    }
-
     public void getFromSettings()
     {
+        NickName = mSettings.AppSettings.getString(Settings.USER_NICK, "");
         RegDate = mSettings.AppSettings.getString(Settings.USER_REGDATE, "");
-        Level = mSettings.AppSettings.getInt(Settings.USER_GROUP, -2);
-        InvCount = mSettings.AppSettings.getInt(Settings.USER_INVCOUNT, 0);
-        InviterNickName = mSettings.AppSettings.getString(Settings.USER_INVITER, "");
-        LastUpdate = mSettings.AppSettings.getInt(Settings.USER_LASTUPDATE, 0);
-    }
-
-    public boolean getFromSite()
-    {
-        if(API_READ_KEY == "")
-            API_READ_KEY = mSettings.AppSettings.getString(Settings.API_READ_KEY, "");
-        String Args = "/api/ajax.php?Version="+APP_VERSION+"&Query=GetUserInfo&Key="+API_READ_KEY;
-        BufferedReader Reader = null;
-        String ReadLine = "";
-        String RawData = "";
-
-        try {
-            URL Uri = new URL(SERVER_URI + Args);
-
-            HttpURLConnection Connection = (HttpURLConnection) Uri.openConnection();
-            Connection.setRequestMethod("GET");
-            Connection.setReadTimeout(10 * 1000);
-            Connection.connect();
-
-            Reader = new BufferedReader(new InputStreamReader(Connection.getInputStream()));
-
-            while ((ReadLine = Reader.readLine()) != null) {
-                RawData += ReadLine;
-            }
-
-            try
-            {
-                JSONObject Json = new JSONObject(RawData);
-                Boolean Successes = Json.getBoolean("Successes");
-                if(Successes)
-                {
-                    NickName = Json.getString("Nickname");
-                    RegDate = Json.getString("RegDate");
-                    Level = Json.getInt("Level");
-                    InvCount = Json.getInt("InvCount");
-                    InviterNickName = Json.getString("Inviter");
-                    LastUpdate = Json.getInt("LastUpdate");
-
-                    mSettings.Editor.putString(Settings.USER_REGDATE, RegDate);
-                    mSettings.Editor.putInt(Settings.USER_GROUP, Level);
-                    mSettings.Editor.putInt(Settings.USER_INVCOUNT, InvCount);
-                    mSettings.Editor.putString(Settings.USER_INVITER, InviterNickName);
-                    mSettings.Editor.putInt(Settings.USER_LASTUPDATE, LastUpdate);
-                    mSettings.Editor.commit();
-
-                    return true;
-                }
-
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally
-        {
-
-        }
-        return false;
+        Level = mSettings.AppSettings.getInt(Settings.USER_GROUP, -1);
     }
 
     public String GetGroup()

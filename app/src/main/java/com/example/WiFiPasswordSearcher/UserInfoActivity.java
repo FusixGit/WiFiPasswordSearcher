@@ -15,7 +15,6 @@ public class UserInfoActivity extends Activity {
     public TextView txtLogin = null;
     public TextView txtRegDate = null;
     public TextView txtGroup = null;
-    public TextView txtInv = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,26 +25,16 @@ public class UserInfoActivity extends Activity {
         User = new UserManager(getApplicationContext());
         User.getFromSettings();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                User.getFromSite();
-            }
-        }).start();
-
         txtLogin = (TextView) findViewById(R.id.txtLogin);
         txtRegDate = (TextView) findViewById(R.id.txtRegDate);
         txtGroup = (TextView) findViewById(R.id.txtGroup);
-        txtInv = (TextView) findViewById(R.id.txtInv);
 
-        String Login = User.Login;
+        String Nick = User.NickName;
         String RegDate = User.RegDate;
         String Group = User.GetGroup();
-        Integer Inv = User.InvCount;
 
-        txtLogin.setText(Login);
-        txtRegDate.setText("Reg date: " + RegDate);
-        txtGroup.setText("Level: " + Group);
-        txtInv.setText("Invites avaible: " + Integer.toString(Inv));
+        txtLogin.setText(Nick);
+        txtRegDate.setText(RegDate);
+        txtGroup.setText(Group);
     }
 }

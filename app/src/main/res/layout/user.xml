@@ -18,23 +18,38 @@
 	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginLeft="4dp"
+		android:textColor="#A0A0A0"
+		android:textSize="14dp"
+		android:text="Registration Date"/>
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="4dp"
+		android:layout_marginBottom="4dp"
+		android:layout_marginLeft="16dp"
 		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:text="Reg date:"
+		android:text="1234-01-01 12:34:56"
 		android:id="@+id/txtRegDate"/>
 
 	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:text="Group: "
-		android:id="@+id/txtGroup"/>
+		android:layout_marginLeft="4dp"
+		android:textColor="#A0A0A0"
+		android:textSize="14dp"
+		android:text="Access Level"/>
 
 	<TextView
-		android:layout_width="wrap_content"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginTop="4dp"
+		android:layout_marginBottom="4dp"
+		android:layout_marginLeft="16dp"
 		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:text="Invited avaible:"
-		android:id="@+id/txtInv"/>
+		android:text="Level"
+		android:id="@+id/txtGroup"/>
 
 </LinearLayout>
 

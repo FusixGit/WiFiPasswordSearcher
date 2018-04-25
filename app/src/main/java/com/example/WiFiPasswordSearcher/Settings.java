@@ -18,10 +18,8 @@ public class Settings
     public static final String API_WRITE_KEY = "WRITE_KEY";
     public static final String API_KEYS_VALID = "KEYS_VALID";
     public static final String USER_REGDATE = "USER_REGDATE";
+    public static final String USER_NICK = "USER_NICK";
     public static final String USER_GROUP = "USER_GROUP";
-    public static final String USER_INVCOUNT = "USER_INVCOUNT";
-    public static final String USER_INVITER = "USER_INVITER";
-    public static final String USER_LASTUPDATE = "USER_LASTUPDATE";
 
 
     public SharedPreferences AppSettings = null;
