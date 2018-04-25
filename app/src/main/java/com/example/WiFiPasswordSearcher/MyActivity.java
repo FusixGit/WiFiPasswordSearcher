@@ -204,6 +204,9 @@ class WiFiListSimpleAdapter extends SimpleAdapter
         ParseInTextTags(txtKeysCount);
         ParseInTextTags(txtWPS);
 
+        int keysCount = Integer.parseInt(txtKeysCount.getText().toString());
+        llKeys.setClickable(keysCount > 1);
+
         txtRowId.setText(Integer.toString(position));
 
         return view;
@@ -470,7 +473,7 @@ public class MyActivity extends Activity {
                             if (apdata.Keys.size() < 1)
                             {
                                 Toast toast = Toast.makeText(getApplicationContext(),
-                                        "No data to copy", Toast.LENGTH_SHORT);
+                                        "Key not found! Nothing to copy", Toast.LENGTH_SHORT);
                                 toast.show();
                                 return;
                             }
