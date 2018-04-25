@@ -255,12 +255,14 @@ public class StartActivity extends Activity {
                     }
                     else
                     {
-                        final String error = Json.getString("error");
+                        String error = Json.getString("error");
+                        final String errorDesc = User.GetErrorDesc(error);
+
                         if (error != null) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast t = Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT);
+                                    Toast t = Toast.makeText(getApplicationContext(), errorDesc, Toast.LENGTH_SHORT);
                                     t.show();
                                 }
                             });
