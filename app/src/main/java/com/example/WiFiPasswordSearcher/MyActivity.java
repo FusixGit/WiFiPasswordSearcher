@@ -867,11 +867,12 @@ public class MyActivity extends Activity {
     }
     private String getStrSignal(int Signal) {
         String Color = "";
-        Signal = 100 + Signal;
+        Signal = (100 + Signal) * 2;
+        Signal = Math.min(Math.max(Signal, 0), 100);
 
-        if (Signal < 25) Color = "*[color:red]*";
-        if (Signal >= 25 && Signal < 65) Color = "*[color:yellow]*";
-        if (Signal >= 50) Color = "*[color:greendark]*";
+        if (Signal < 48) Color = "*[color:red]*";
+        if (Signal >= 48 && Signal < 65) Color = "*[color:yellow]*";
+        if (Signal >= 65) Color = "*[color:greendark]*";
 
         return Color + Integer.toString(Signal) + "%";
     }

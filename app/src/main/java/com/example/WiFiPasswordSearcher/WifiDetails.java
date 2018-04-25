@@ -197,7 +197,7 @@ public class WifiDetails extends Activity
                     break;
                 }
             }
-            if(!Founded) setSignal("0");
+            if (!Founded) setSignal("-100");
             try {
                 Thread.sleep((long)1000, 0);
             } catch (InterruptedException e) {
@@ -287,15 +287,18 @@ public class WifiDetails extends Activity
 
     private void setSignal(String Signal)
     {
-        final int iSignal = 100 + Integer.parseInt(Signal);
+        int iSignal = Integer.parseInt(Signal);
+        iSignal = (100 + iSignal) * 2;
+        iSignal = Math.min(Math.max(iSignal, 0), 100);
+        final int fSignal = iSignal;
         LastSignal = iSignal;
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                graphSeries.appendData(new DataPoint(iGraphPointCount, iSignal), true, 25);
+                graphSeries.appendData(new DataPoint(iGraphPointCount, fSignal), true, 25);
                 iGraphPointCount++;
-                txtChannel.setText("Signal: " + iSignal + "%");
+                txtChannel.setText("Signal: " + fSignal + "%");
             }
         });
     }
