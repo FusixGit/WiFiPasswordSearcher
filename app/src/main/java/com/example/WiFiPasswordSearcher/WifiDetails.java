@@ -167,10 +167,11 @@ public class WifiDetails extends Activity
         int PickSoundId = mSoundPool.load(getApplicationContext(), R.raw.pick, 1);
         int SleepTime = 0;
 
-        while(UseWifiDetector)
+        while (UseWifiDetector)
         {
-            mSoundPool.play(PickSoundId, 1, 1, 100, 0, 1);
-            SleepTime = 2000-(2000/85)*LastSignal;
+            if (LastSignal > 0)
+                mSoundPool.play(PickSoundId, 1, 1, 100, 0, 1);
+            SleepTime = 2100-(2000/100)*LastSignal;
             try {
                 Thread.sleep((long)SleepTime, 0);
             } catch (InterruptedException e) {
