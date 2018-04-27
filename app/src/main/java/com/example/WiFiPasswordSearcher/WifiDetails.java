@@ -46,6 +46,7 @@ public class WifiDetails extends Activity
     private int LastFreq;
     private String LastBSSID;
     private String LastESSID;
+    private Settings mSettings;
 
 
     private LineGraphSeries<DataPoint> graphSeries;
@@ -94,6 +95,9 @@ public class WifiDetails extends Activity
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 UseWifiDetector = isChecked;
 
+                mSettings.Editor.putBoolean(Settings.WIFI_SIGNAL, UseWifiDetector);
+                mSettings.Editor.commit();
+
                 if (UseWifiDetector) {
                     DetectorThread = new Thread(new Runnable() {
                         @Override
@@ -105,6 +109,12 @@ public class WifiDetails extends Activity
                 }
             }
         });
+
+        mSettings = new Settings(getApplicationContext());
+        mSettings.Reload();
+
+        Boolean wifiSignal = mSettings.AppSettings.getBoolean(Settings.WIFI_SIGNAL, false);
+        chkbUseDetector.setChecked(wifiSignal);
 
         setBSSID(StartWifiInfo.get("BSSID"));
         setESSID(StartWifiInfo.get("SSID"));

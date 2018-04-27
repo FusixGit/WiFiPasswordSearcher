@@ -20,6 +20,7 @@ public class Settings
     public static final String USER_REGDATE = "USER_REGDATE";
     public static final String USER_NICK = "USER_NICK";
     public static final String USER_GROUP = "USER_GROUP";
+    public static final String WIFI_SIGNAL = "WIFI_SIGNAL";
 
 
     public SharedPreferences AppSettings = null;
