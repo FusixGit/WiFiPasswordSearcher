@@ -94,6 +94,13 @@
 			android:layout_gravity="center_horizontal"
 			android:visibility="visible"/>
 
+		<Button
+			android:layout_height="wrap_content"
+			android:text="Offline"
+			android:layout_width="match_parent"
+			android:id="@+id/btnOffline"
+			android:onClick="btnOffline"/>
+
 		<LinearLayout
 			android:orientation="horizontal"
 			android:layout_width="fill_parent"
