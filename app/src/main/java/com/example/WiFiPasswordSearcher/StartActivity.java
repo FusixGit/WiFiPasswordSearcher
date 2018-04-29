@@ -278,4 +278,9 @@ public class StartActivity extends Activity {
             }
         return false;
     }
+    public void btnOffline(View view)
+    {
+        Intent offlineActivityIntent = new Intent(StartActivity.this, MyActivity.class);
+        startActivity(offlineActivityIntent);
+    }
 }

@@ -2,10 +2,14 @@ package com.example.WiFiPasswordSearcher;
 
 import android.app.*;
 import android.content.*;
+import android.database.*;
+import android.database.sqlite.*;
+import android.graphics.*;
 import android.os.*;
-import android.util.*;
 import android.view.*;
+import android.webkit.*;
 import android.widget.*;
+import java.io.*;
 import java.util.*;
 import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
@@ -15,8 +19,10 @@ import org.json.*;
 
 public class WPSActivity extends Activity
 {
-	ArrayList<ItemWps> data = new ArrayList<ItemWps>();
+	private WebView mWebView;
 
+	ArrayList<ItemWps> data = new ArrayList<ItemWps>();
+	String[] pinlist;
 	ProgressDialog pd=null;
 	private Settings mSettings;
     public static String SERVER_URI = "";
@@ -27,11 +33,37 @@ public class WPSActivity extends Activity
 	ArrayList<String> wpsScore = new ArrayList<String>();
 	ArrayList<String> wpsDb = new ArrayList<String>();
 
-	@Override
-    public void onCreate(Bundle savedInstanceState)
+	private DatabaseHelper mDBHelper;
+	private SQLiteDatabase mDb;
+
+
+    public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.wps);
+		findViewById(R.id.baseButton).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
+
+		mDBHelper = new DatabaseHelper(this);
+		try
+		{
+            mDBHelper.updateDataBase();
+        }
+		catch (IOException mIOException)
+		{
+            throw new Error("UnableToUpdateDatabase");
+        }
+
+        try
+		{
+            mDb = mDBHelper.getWritableDatabase();
+        }
+		catch (SQLException mSQLException)
+		{
+            throw mSQLException;
+        }
+
+
+
 
 		if (android.os.Build.VERSION.SDK_INT > 9)
 		{
@@ -53,6 +85,23 @@ public class WPSActivity extends Activity
 		BSSDWpsText.setText(BSSDWps); // BSSID
 
 		new GetPinsFromBase().execute(BSSDWps);
+		
+		mWebView = (WebView) findViewById(R.id.webView);
+		mWebView.addJavascriptInterface(new myJavascriptInterface(), "HtmlHandler");
+		mWebView.setWebViewClient(new WebViewClient(){
+				@Override
+				public void onPageFinished(WebView view, String url)
+				{
+					super.onPageFinished(view, url);
+					final String BSSDWps = getIntent().getExtras().getString("variable1");
+					mWebView.loadUrl("javascript:document.getElementById('bssids').innerHTML = '" + BSSDWps + "';pinSuggest()");
+					mWebView.loadUrl("javascript:window.HtmlHandler.handleHtml" +
+									 "(document.getElementById('result').value);");//js возвращает значение
+
+				}
+			});
+		mWebView.getSettings().setJavaScriptEnabled(true);
+		mWebView.loadUrl("file:///android_asset/wpspin.html");
 
     }
 	private class GetPinsFromBase extends AsyncTask <String, Void, String>
@@ -95,10 +144,7 @@ public class WPSActivity extends Activity
 				response = hc.execute(http, res);
 			}
 			catch (Exception e)
-			{
-			    e.printStackTrace();
-			    return null;
-			}
+			{}
 			try
 			{
 				JSONObject jObject = new JSONObject(response);
@@ -152,31 +198,105 @@ public class WPSActivity extends Activity
 
 			wpslist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 					@Override
-					public void onItemClick(AdapterView<?> parent, View itemClicked, int position,
-											long id)
+					public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id)
 					{
-						Toast.makeText(getApplicationContext(), "Pin " + wpsPin.get(position) + " copied",
-									   Toast.LENGTH_SHORT).show();
-						ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-						ClipData dataClip = ClipData.newPlainText("text", wpsPin.get(position));
-						clipboard.setPrimaryClip(dataClip);
+						String pin = wpsPin.get(position);
+						Toast.makeText(getApplicationContext(), "Pin " + pin + " copied", Toast.LENGTH_SHORT).show();
+						try
+						{
+							ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+							ClipData dataClip = ClipData.newPlainText("text", pin);
+							clipboard.setPrimaryClip(dataClip);
+						}
+						catch (Exception e)
+						{}
 					}
 				});
 		}
     }
 	public void btnwpsbaseclick(View view)
 	{ //пины из базы
+		findViewById(R.id.baseButton).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
+		findViewById(R.id.wpsButton1).getBackground().clearColorFilter();
+		findViewById(R.id.wpsButton2).getBackground().clearColorFilter();
 		String BSSDWps = getIntent().getExtras().getString("variable1");
-		//getWpsFromBase(BSSDWps);
 		new GetPinsFromBase().execute(BSSDWps);
 	}
 
+	
+private class myJavascriptInterface {
+		
+		@JavascriptInterface
+		public void handleHtml(String html) {
+			pinlist = html.split("\n");
+			
+		}
+}
+
+
 	public void btnGenerate(View view)
 	{ //генераторpppppp
-		ListView wpslist = (ListView)findViewById(R.id.WPSlist);
+		findViewById(R.id.wpsButton1).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
+		findViewById(R.id.baseButton).getBackground().clearColorFilter();
+		findViewById(R.id.wpsButton2).getBackground().clearColorFilter();
+		ListView wpslist = (ListView) findViewById(R.id.WPSlist);
 		wpslist.setAdapter(null);
+		wpsPin.clear();
+		wpsMet.clear();
+		data.clear();
+		String p1 = null,p2=null;
+		String sug="";
+
+		for (int i=0; i<pinlist.length; i++){
+		
+			if (pinlist[i].length()>7){
+
+				p1=pinlist[i].substring(0,8);
+				p2=pinlist[i].substring(10);
+				if (!wpsPin.contains(p1)){
+				if (p1.equals("Suggeste"))sug="✔";
+				if (p1.equals("Generate"))sug="";
+				if (!p1.equals("Generate") & !p1.equals("Suggeste")){
+			wpsPin.add(p1);
+			wpsMet.add(p2);
+				data.add(new ItemWps(p1, p2, "---", sug));}}
+			}
+		
+			
+		
+		}
+		wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
+
 	}
 
+	public void btnLocalClick(View view)
+	{ //локальная база
+		findViewById(R.id.wpsButton2).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
+		findViewById(R.id.wpsButton1).getBackground().clearColorFilter();
+		findViewById(R.id.baseButton).getBackground().clearColorFilter();
+		ListView wpslist = (ListView) findViewById(R.id.WPSlist);
+		wpslist.setAdapter(null);
+		final String BSSDWps = getIntent().getExtras().getString("variable1");
+
+		try
+		{
+			data.clear();
+			wpsPin.clear();
+			Cursor cursor = mDb.rawQuery("SELECT * FROM pins WHERE mac='" + BSSDWps.substring(0, 8) + "'", null);
+			cursor.moveToFirst();
+			do {
+				data.add(new ItemWps(cursor.getString(0), "---", "---", "---"));
+				wpsPin.add(cursor.getString(0));
+			}
+			while(cursor.moveToNext());
+			cursor.close();
+		}
+		catch (Exception e)
+		{data.add(new ItemWps(null, "   not found", null, null));}
+		wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
+
+		wpslist.setEnabled(true);
+	}
 
 	//Toast
 	public void toastMessage(String text)
