@@ -99,7 +99,8 @@
 			android:text="Offline"
 			android:layout_width="match_parent"
 			android:id="@+id/btnOffline"
-			android:onClick="btnOffline"/>
+			android:onClick="btnOffline"
+			android:visibility="gone"/>
 
 		<LinearLayout
 			android:orientation="horizontal"
