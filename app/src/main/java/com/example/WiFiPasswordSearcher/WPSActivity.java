@@ -126,8 +126,8 @@ public class WPSActivity extends Activity
 			wpsMet.clear();
 			DefaultHttpClient hc = new DefaultHttpClient();
 			DefaultHttpClient hc2 = new DefaultHttpClient();
-			ResponseHandler res = new BasicResponseHandler();
-			ResponseHandler res2 = new BasicResponseHandler();
+			ResponseHandler<String> res = new BasicResponseHandler();
+			ResponseHandler<String> res2 = new BasicResponseHandler();
 
 			HttpPost http2 = new HttpPost("http://wpsfinder.com/ethernet-wifi-brand-lookup/MAC:" + BSSID);
 			try
