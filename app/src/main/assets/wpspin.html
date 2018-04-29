@@ -2,6 +2,330 @@
 <head>
 <title>3WiFi: WPS PIN generator</title>
 <meta http-equiv=Content-Type content="text/html;charset=UTF-8">
+<meta name="keywords" content="3wifi, wifi, router, scan, Router Scan, access point, map, internet, free"/>
+<script type="text/javascript">
+function isMobile() 
+{ 
+	if( navigator.userAgent.match(/Android/i)
+	|| navigator.userAgent.match(/webOS/i)
+	|| navigator.userAgent.match(/iPhone/i)
+	|| navigator.userAgent.match(/iPad/i)
+	|| navigator.userAgent.match(/iPod/i)
+	|| navigator.userAgent.match(/BlackBerry/i)
+	|| navigator.userAgent.match(/Windows Phone/i)
+	|| navigator.userAgent.match(/Mobile/i))
+	{
+		return true;
+	}
+	if(window.innerWidth <= 800 && window.innerHeight <= 600) 
+	{
+		return true;
+	}
+	return false;
+}
+
+function errorStr(error)
+{
+	switch (error)
+	{
+		case 'database':
+		return 'Database cannot handle request';
+		case 'loggedin':
+		return 'Already logged in';
+		case 'unauthorized':
+		return 'You are not authorized';
+		case 'loginfail':
+		return 'Wrong login or password';
+		case 'form':
+		return 'Some form fields are incorrect';
+		case 'invite':
+		return 'Wrong invitation code';
+		case 'login':
+		return 'Username already exists';
+		case 'nick':
+		return 'Nickname already exists';
+		case 'password':
+		return 'Password does not meet requirements';
+		case 'lowlevel':
+		return 'This function is inaccessible with your access level';
+		case 'limit':
+		return 'Usage limit is reached';
+		case 'token':
+		return 'Token is incorrect, clear your browser cache and try again';
+		case 'notfound':
+		return 'Not found';
+		default:
+		return 'Unknown error';
+	}
+}
+function encodeHTML(str, spaces)
+{
+	str = $('<div>').text(str).html();
+	if (spaces) str = str.replace(/ /g, '&nbsp;');
+	return str;
+}
+function loadForm(frm, callback)
+{
+	if ($.trim($(frm).html()) != '')
+	{
+		callback();
+		return;
+	}
+	switch (frm)
+	{
+		case '#win_login':
+		$(frm).load('?fetch=' + frm.substr(1), function(response, status, xhr)
+		{
+			if (status == "error")
+			{
+				$(frm).html('');
+				return false;
+			}
+			callback();
+		});
+		break;
+		case '#win_reg':
+		$(frm).load('?fetch=' + frm.substr(1), function(response, status, xhr)
+		{
+			if (status == "error")
+			{
+				$(frm).html('');
+				return false;
+			}
+			callback();
+		});
+		break;
+		case '#win_newpass':
+		$(frm).load('?fetch=' + frm.substr(1), function(response, status, xhr)
+		{
+			if (status == "error")
+			{
+				$(frm).html('');
+				return false;
+			}
+			callback();
+		});
+		break;
+	}
+}
+function showModal(frm)
+{
+	loadForm(frm, function()
+	{
+		$('#win_login').css({left: '-9999px'});
+		$('#win_reg').css({left: '-9999px'});
+		$('#win_newpass').css({left: '-9999px'});
+		$(frm).css({left: '50%'});
+		$(frm).css({top: '50%'});
+		$('.modal').show();
+		$('.modal').animate({opacity: 1}, 250);
+	});
+}
+function hideModal()
+{
+	$('.modal').animate({opacity: 0}, 250, function() { $('.modal').hide() });
+}
+function showFrm(frm)
+{
+	loadForm(frm, function()
+	{
+		var frm2 = (frm == '#win_login' ? '#win_reg' : '#win_login')
+		switch (Math.round(Math.random()*3))
+		{
+			case 0: // right to left
+			$(frm).css({left: '150%'});
+			$(frm).css({top: '50%'});
+			$(frm2).animate({left: '-50%'}, 500);
+			$(frm).animate({left: '50%'}, 500);
+			break;
+			case 1: // left to right
+			$(frm).css({left: '-50%'});
+			$(frm).css({top: '50%'});
+			$(frm2).animate({left: '150%'}, 500);
+			$(frm).animate({left: '50%'}, 500);
+			break;
+			case 2: // bottom to top
+			$(frm).css({left: '50%'});
+			$(frm).css({top: '150%'});
+			$(frm2).animate({top: '-50%'}, 500);
+			$(frm).animate({top: '50%'}, 500);
+			break;
+			case 3: // top to bottom
+			$(frm).css({left: '50%'});
+			$(frm).css({top: '-50%'});
+			$(frm2).animate({top: '150%'}, 500);
+			$(frm).animate({top: '50%'}, 500);
+			break;
+		}
+	});
+}
+function doLogin()
+{
+	var formdata = $('#frm_login').serialize();
+	$('#frm_login :input').prop('disabled', true);
+	$('#loginstat').html('<img src="img/loading.gif">');
+	$.post('user.php?a=login', formdata, function(json)
+	{
+		if (json.result)
+		{
+			$('#loginstat').html('<img src="img/ok.png" style="position: relative; top: 3px"> Login success!');
+			setTimeout($('#stayhere').prop('checked') ? (typeof refreshLocation == "function" ? 'refreshLocation();' : 'window.location.reload();') : 'window.location.href = \'user\';', 1000);
+		}
+		else
+		{
+			var errstr = (typeof json.error == 'string' ? json.error : '');
+			$('#loginstat').html('<img src="img/no.png" style="position: relative; top: 3px"> ' + errorStr(errstr));
+			$('#frm_login :input').prop('disabled', false);
+		}
+	});
+}
+function doLogout()
+{
+	var onFail = function(jqXHR, textStatus, errorThrown)
+	{
+		alert('No data received');
+	};
+	$.get('user.php?a=token', function(json)
+	{
+		if (!json.result)
+		{
+			alert(errorStr(json.error));
+			return;
+		} else {
+			var data = '';
+			data += '&token=' + encodeURIComponent(json.token);
+			$.get('user.php?a=logout' + data, function(json)
+			{
+				window.location.href = 'home';
+			});
+		}
+	}).fail(onFail);
+}
+function doReg()
+{
+	var formdata = $('#frm_reg').serialize();
+	$('#frm_reg :input').prop('disabled', true);
+	$('#regstat').html('<img src="img/loading.gif">');
+	$.post('user.php?a=reg', formdata, function(json)
+	{
+		if (json.result)
+		{
+			$('#checkinv').empty();
+			$('#regstat').html('<img src="img/ok.png" style="position: relative; top: 3px"> Registration success!');
+			setTimeout('window.location.href = \'user\';', 2000);
+		}
+		else
+		{
+			var errstr = (typeof json.error == 'string' ? json.error : '');
+			$('#regstat').html('<img src="img/no.png" style="position: relative; top: 3px"> ' + errorStr(errstr));
+			if (errstr == 'invite') $('#checkinv').html('<img src="img/no.png">');
+			$('#frm_reg :input').prop('disabled', false);
+		}
+	});
+}
+function loginBtn(force)
+{
+	if (ProfileInfo.isUser == 0 || force)
+	{
+		showModal('#win_login');
+	} else {
+		doLogout();
+	}
+}
+function loginRequireMsg()
+{
+	return 'You are not authorized. <a href="javascript://" onclick="loginBtn(true)">Please login.</a>';
+}
+function getCookie(cname)
+{
+	var name = cname + "=";
+	var decodedCookie = decodeURIComponent(document.cookie);
+	var ca = decodedCookie.split(';');
+	for(var i = 0; i <ca.length; i++)
+	{
+		var c = ca[i];
+		while (c.charAt(0) == ' ')
+		{
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0)
+		{
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
+}
+function delCookie(name)
+{
+	document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+function settingsGetBool(name, def)
+{
+	var ret = localStorage.getItem(name);
+	return (ret == null ? def : (ret == 1));
+}
+function settingsSetBool(name, val)
+{
+	localStorage.setItem(name, (val ? '1':'0'));
+}
+function recheckCoordsLock()
+{
+	if (getCookie('uselocation') != '')
+	{
+		$('.coordlock').html('<img src="img/icon-location.png"/> Location locked &nbsp;<button class=delcoord>Reset</button>');
+		$('button.delcoord').click(function ()
+		{
+			if (!confirm('Reset current location?')) return false;
+			delCookie('uselocation');
+			if (getCookie('uselocation') == '')
+			{
+				$('.coordlock').html('');
+				delCoordCallback();
+			}
+		});
+	}
+	else
+		$('.coordlock').html('');
+}
+
+var ProfileInfo = {isUser: 0, Nickname: "", Level: -1, invites: 0};
+
+function initmenu()
+{
+	if(this != top)
+	{
+		top.location.href = this.location.href;
+	}
+	if (ProfileInfo.isUser == 0) $('a[href=user]').hide();
+
+	if(!isMobile())
+	{
+		$('.multi').mouseenter(function()
+		{
+			$(this.children[1]).show();
+		}).mouseleave(function()
+		{
+			$(this.children[1]).hide();
+		});
+	}
+	else
+	{
+		$('.multi').click(function()
+		{
+			if(!this.children[1].isDoubleTap)
+			{
+				this.children[1].isDoubleTap = true;
+				$(this.children[1]).show();
+				return false;
+			}
+			$(this.children[1]).hide();
+			this.children[1].isDoubleTap = false;
+			return true;
+		});
+	}
+	recheckCoordsLock();
+}
+</script>
 
 <script type="text/javascript">
 function zeroFill(number, width)
@@ -38,10 +362,48 @@ function genPin(mac, sn, i)
 {
 	return (algos[i].mode == ALGO_MACSN ? algos[i].func(mac, sn) : algos[i].func(mac));
 }
+function pinSuggestAPI(getAll, bssid, sn)
+{
+	var result = [];
+	var mac = bssid.replace(/:/g, '').replace(/-/g, '').replace(/\./g, '').replace(/ /g, '');
+	mac = parseInt(mac, 16);
+	if (isNaN(mac) || mac > 0xFFFFFFFFFFFF) return result;
+
+	for (var i = 0; i < algos.length; i++)
+	{
+		var match = getAll;
+
+		if (!getAll)
+		{
+			var info = document.getElementById(algos[i].id).value.split("\n");
+			for (var k = 0; k < info.length; k++)
+			{
+				if (info[k].indexOf('  ') == 0 && info[k].lastIndexOf(':xx') == 16)
+				{
+					info[k] = info[k].substr(2);
+					info[k] = info[k].substr(0, info[k].indexOf('x'));
+					match = bssid.indexOf(info[k]) == 0;
+					if (match) break;
+				}
+			}
+		}
+		if (match)
+		{
+			var pin = genPin(mac, sn, i);
+			if (typeof pin != 'string')
+			{
+				pin = pinChecksum(pin);
+				pin = zeroFill(pin.toString(10), 8);
+			}
+			result.push({pin: pin, algo: i});
+		}
+	}
+	return result;
+}
 function pinSuggest()
 {
-	document.getElementById('result').value = '';
-	var ln = document.getElementById('bssids').value.replace(/^\s+|\s+$/g, '').split("\n");
+	$('#result').empty();
+	var ln = $('#bssids').val().replace(/^\s+|\s+$/g, '').split("\n");
 	for (var j = 0; j < ln.length; j++)
 	{
 		var m = ln[j];
@@ -56,50 +418,29 @@ function pinSuggest()
 		mt = insert(mt, ':', 6);
 		mt = insert(mt, ':', 4);
 		mt = insert(mt, ':', 2);
-		document.getElementById('suggpin').value = "Suggested PIN codes for "+mt+"\n\n";
-		var sugg = false;
-		for (var i = 0; i < algos.length; i++)
+		$('#suggpin').text("Suggested PIN codes for "+mt+"\n\n");
+		var sugg = pinSuggestAPI(false, mt, z[1]);
+		for (var i = 0; i < sugg.length; i++)
 		{
-			var info = document.getElementById(algos[i].id).value.split("\n");
-			for (var k = 0; k < info.length; k++)
+			var pin = sugg[i].pin;
+			if (pin == '')
+				pin = '<empty>';
+			pin = pin.padEnd(8);
+
+			if (algos[sugg[i].algo].mode == ALGO_STATIC)
 			{
-				if (info[k].indexOf('  ') == 0 && info[k].lastIndexOf(':xx') == 16)
-				{
-					info[k] = info[k].substr(2);
-					info[k] = info[k].substr(0, info[k].indexOf('x'));
-					if (mt.indexOf(info[k]) == 0)
-					{
-						sugg = true;
-						var pin = genPin(m, z[1], i);
-						if (typeof pin == 'string')
-						{
-							if (pin == '')
-							//ошибка
-								pin = '<empty>';
-							//pin = pin.padEnd(8);
-						} else {
-							pin = pinChecksum(pin);
-							pin = zeroFill(pin.toString(10), 8);
-						}
-						if (algos[i].mode == ALGO_STATIC)
-						{
-							document.getElementById('suggpin').value += pin + ' | Static PIN - ' + algos[i].name + "\n";
-						} else {
-							document.getElementById('suggpin').value += pin + ' | ' + algos[i].name + "\n";
-						}
-					}
-				}
+				$('#suggpin').append(encodeHTML(pin, true) + ' | Static PIN - ' + algos[sugg[i].algo].name + "\n");
+			} else {
+				$('#suggpin').append(encodeHTML(pin, true) + ' | ' + algos[sugg[i].algo].name + "\n");
 			}
 		}
-		if (sugg) document.getElementById('result').value += document.getElementById('suggpin').value + "\n";
+		if (sugg.length > 0) $('#result').append(encodeHTML($('#suggpin').val()) + "\n");
 	}
-	//$('#algosel').val('algonone');
-	getAll();
+	$('#algosel').val('algonone');
 }
 function getAll()
 {
-var m = document.getElementById('bssids').value.replace(/^\s+|\s+$/g, '').split("\n");
-	
+	var m = $('#bssids').val().replace(/^\s+|\s+$/g, '').split("\n");
 	if (m.length > 1)
 		return alert('This function only for one BSSID.');
 	var bss = m[0].replace(/ /g, '').toUpperCase();
@@ -109,30 +450,51 @@ var m = document.getElementById('bssids').value.replace(/^\s+|\s+$/g, '').split(
 	m = parseInt(m, 16);
 	if (isNaN(m) || m > 0xFFFFFFFFFFFF)
 		return alert('Incorrect BSSID.');
-	document.getElementById('result').value += "Generated PIN codes for "+bss+"\n\n";
-	for (var i = 0; i < algos.length; i++)
+	$('#result').text("PIN codes for "+bss+"\n\n");
+	var res = pinSuggestAPI(true, bss, z[1]);
+	for (var i = 0; i < res.length; i++)
 	{
-		var pin = genPin(m, z[1], i);
-		if (typeof pin == 'string')
+		var pin = res[i].pin;
+		if (pin == '')
+			pin = '<empty>';
+		pin = pin.padEnd(8);
+
+		if (algos[res[i].algo].mode == ALGO_STATIC)
 		{
-			if (pin == '')
-			//ошибка 
-				pin = '<empty>';
-			//pin = pin.padEnd(8);
+			$('#result').append(encodeHTML(pin, true) + ' | Static PIN - ' + algos[res[i].algo].name + "\n");
 		} else {
-			pin = pinChecksum(pin);
-			pin = zeroFill(pin.toString(10), 8);
-		}
-		if (algos[i].mode == ALGO_STATIC)
-		{
-			document.getElementById('result').value += pin + ' | Static PIN - ' + algos[i].name + "\n";
-		} else {
-			document.getElementById('result').value += pin + ' | ' + algos[i].name + "\n";
+			$('#result').append(encodeHTML(pin, true) + ' | ' + algos[res[i].algo].name + "\n");
 		}
 	}
-	//$('#algosel').val('algonone');
+	$('#algosel').val('algonone');
 }
-
+function showAlgo()
+{
+	var algo = $('#algosel').val();
+	$('#result').empty();
+	for (var i = 0; i < algos.length; i++)
+	{
+		if (algos[i].id == algo)
+		{
+			switch (algos[i].mode)
+			{
+			case ALGO_MAC:
+			case ALGO_MACSN:
+				$('#result').append(algos[i].name + " algorithm,\n");
+				break;
+			case ALGO_STATIC:
+				$('#result').append(algos[i].name + " static PIN,\n");
+				break;
+			case ALGO_EMPTY:
+				$('#result').append(algos[i].name + ",\n");
+				break;
+			}
+			$('#result').append("used by these devices:\n\n");
+			$('#result').append($('#' + algos[i].id).val());
+			break;
+		}
+	}
+}
 function checkDSLkeys(keys)
 {
 	if (keys.length > 0)
@@ -212,7 +574,7 @@ function unreference(obj)
 }
 function crackAlgo()
 {
-	document.getElementById('result').value = '';
+	$('#result').empty();
 	var ln = $('#bssids').val().replace(/^\s+|\s+$/g, '').split("\n");
 	var pairs = [];
 	for (var j = 0; j < ln.length; j++)
@@ -233,7 +595,7 @@ function crackAlgo()
 		mt = insert(mt, ':', 4);
 		mt = insert(mt, ':', 2);
 		var sugg = false;
-		document.getElementById('suggpin').value = '';
+		$('#suggpin').empty();
 		for (var i = 0; i < algos.length; i++)
 		{
 			var pin = genPin(m, z[2], i);
@@ -305,9 +667,71 @@ function crackAlgo()
 			}
 		}
 	}
-	//$('#algosel').val('algonone');
+	$('#algosel').val('algonone');
 }
+function detect()
+{
+	var formdata = $($('form')[0]).serialize();
+	$('input').prop('disabled', true);
+	$('button').prop('disabled', true);
+	$('#fdata').empty();
+	$('#fhead').empty();
+	$('#fhead').append('<tr><th>Algorithm</th><th>WPS PIN</th><th>Notes</th><th>Probability</th></tr>');
+	$('#fdata').append('<tr><td colspan=4><img src="img/loading.gif"></td></tr>');
 
+	$.post('3wifi.php?a=wpspin', formdata, function(d)
+	{
+		$('input').prop('disabled', false);
+		$('button').prop('disabled', false);
+		if (!d.result)
+		{
+			if (d.error == 'database')
+			{
+				$('#fdata > tr:first-child > :first-child').text('Database cannot handle request.');
+			}
+			else if (d.error == 'bssid')
+			{
+				$('#fdata > tr:first-child > :first-child').text('Incorrect BSSID.');
+			}
+			else
+			{
+				$('#fdata > tr:first-child > :first-child').text('Unknown error.');
+			}
+			return;
+		}
+		if (!d.auth)
+		{
+			$('#fdata > tr:first-child > :first-child').html(loginRequireMsg());
+			return;
+		}
+		if (d.scores.length > 0)
+		{
+			$('#fdata').empty();
+			for (var i = 0; i < d.scores.length; i++)
+			{
+				var info = '';
+				var pin = d.scores[i].value;
+				if (d.scores[i].fromdb)
+					info += '<img src="img/ok.png" title="AP from database"/>';
+				if (pinChecksum(Math.floor(pin / 10)) != pin)
+					info += ' <img src="img/icon-warning.png" title="Non-standart PIN (wrong checksum)"/>';
+				$('#fdata').append('<tr><td>'+d.scores[i].name+'</td><td>'+pin+'</td><td>'+info+'</td><td style="text-align: left"><span class=perc></span><b>&nbsp; '+Math.round(d.scores[i].score * 100)+'%</b></td></tr>');
+				var perc = $('.perc:last');
+				var wid = 180;
+				perc.css('width', wid + 'px');
+				var chld = $('<span class=perc-data>');
+				chld.css('width', Math.round(d.scores[i].score * 100) + '%');
+				perc.html(chld);
+			}
+		} else {
+			$('#fdata > tr:first-child > :first-child').text('No matched devices and/or algorithms found.');
+		}
+	}).fail(function(jqXHR, textStatus, errorThrown) {
+		$('#fdata > tr:first-child > :first-child').text('No data received.');
+		$('input').prop('disabled', false);
+		$('button').prop('disabled', false);
+	});
+}
 function algoDLink(mac)
 {
 	mac &= 0xFFFFFF;
@@ -476,8 +900,7 @@ function get_all_combs(pin, nic, sn)
 }
 function intersect(a, b)
 {
-	// ошибка: return a.filter((n) => b.includes(n));
-
+	return a.filter((n) => b.includes(n));
 }
 function intersect_combs(a, b)
 {
@@ -518,7 +941,7 @@ function intersect_pairs(pairs)
 	}
 	return c0;
 }
-function initpage()
+function initAlgos()
 {
 	ALGO_MAC = 0;
 	ALGO_MACSN = 1;
@@ -695,7 +1118,8 @@ function initpage()
 	algos.push({id: "pinAirc1", name: "Airocon 1", mode: ALGO_STATIC, func: function (mac) {return 3043203;}});
 	algos.push({id: "pinAirc2", name: "Airocon 2", mode: ALGO_STATIC, func: function (mac) {return 7141225;}});
 	algos.push({id: "pinDSL2740R", name: "DSL-2740R", mode: ALGO_STATIC, func: function (mac) {return 6817554;}});
-	algos.push({id: "pinRealtek", name: "Realtek", mode: ALGO_STATIC, func: function (mac) {return 9566146;}});
+	algos.push({id: "pinRealtek1", name: "Realtek 1", mode: ALGO_STATIC, func: function (mac) {return 9566146;}});
+	algos.push({id: "pinRealtek2", name: "Realtek 2", mode: ALGO_STATIC, func: function (mac) {return 9571911;}});
 	algos.push({id: "pinUpvel", name: "Upvel", mode: ALGO_STATIC, func: function (mac) {return 2085483;}});
 	algos.push({id: "pinUR814AC", name: "UR-814AC", mode: ALGO_STATIC, func: function (mac) {return 4397768;}});
 	algos.push({id: "pinUR825AC", name: "UR-825AC", mode: ALGO_STATIC, func: function (mac) {return 0529417;}});
@@ -705,13 +1129,58 @@ function initpage()
 	algos.push({id: "pinHG532x", name: "HG532x", mode: ALGO_STATIC, func: function (mac) {return 3425928;}});
 	algos.push({id: "pinONO", name: "CBN ONO", mode: ALGO_STATIC, func: function (mac) {return 9575521;}});
 }
+function initpage()
+{
+	initAlgos();
+	for (var i = 0; i < algos.length; i++)
+	{
+		if (algos[i].mode == ALGO_STATIC)
+		{
+			$('#algosel').append($('<option>').val(algos[i].id).text('Static PIN - ' + algos[i].name));
+		} else {
+			$('#algosel').append($('<option>').val(algos[i].id).text(algos[i].name));
+		}
+	}
+}
 </script>
 
 </head>
-<body onload="initpage()">
+<body onload="initmenu(); initpage()">
 <div class=header>
 	
-	
+	<div class=mainmenu>
+		<a href="home"><img class=menulogo src="img/logo.png"></a>
+		<div class="menubtn logoplace"><p></p></div>
+		<span class=multi>
+			<a href="home"><div class="menubtn"><p>About</p></div></a>
+			<span class=submenu>
+				<a href="home"><div class="submbtn"><p>Home</p></div></a>
+				<a href="faq"><div class="submbtn"><p>F.A.Q</p></div></a>
+				<a href="apidoc"><div class="submbtn"><p>3WiFi API</p></div></a>
+				<a href="rules"><div class="submbtn"><p>Site rules</p></div></a>
+			</span>
+		</span>
+		<a href="map"><div class="menubtn"><p>Map</p></div></a>
+		<a href="find"><div class="menubtn"><p>Search</p></div></a>
+		<span class=multi>
+			<a href="ranges"><div class="menubtn mbsel"><p>Tools</p></div></a>
+			<span class=submenu>
+				<a href="ranges"><div class="submbtn"><p>Search IP ranges</p></div></a>
+				<a href="devmac"><div class="submbtn"><p>Device by MAC</p></div></a>
+				<a href="wpspin"><div class="submbtn smsel"><p>WPS PIN generator</p></div></a>
+			</span>
+		</span>
+		<a href="upload"><div class="menubtn"><p>Upload</p></div></a>
+		<span class=multi>
+			<a href="stat"><div class="menubtn"><p>State</p></div></a>
+			<span class=submenu>
+				<a href="stat"><div class="submbtn"><p>Statistics</p></div></a>
+				<a href="graph"><div class="submbtn"><p>Dynamics</p></div></a>
+			</span>
+		</span>
+		<a href="javascript://" onclick="loginBtn(false)" style="float: right"><div class=menubtn><p>Login</p></div></a>
+		<a href="user"><div class="menubtn" style="float: right" id=nickname><p></p></div></a>
+	</div>
 </div>
 
 
@@ -732,7 +1201,33 @@ function initpage()
 			</td></tr>
 		</table>
 
-		
+		<div>Implemented algorithms (choose for info):</div>
+
+		<select id=algosel onchange="showAlgo()"><option value=algonone>Not selected</option></select>
+
+		&nbsp; <button onclick="crackAlgo()">Check algorithm</button>
+	</td><td width=50% style="vertical-align: top">
+		<p>Online 3WiFi WPS PIN generator.</p>
+		<p>Takes advantage of collected data in the database, detects linear sequences, static PIN codes, and other algorithms.</p>
+		<form id=fdeviceform enctype="multipart/form-data" method="POST" onsubmit="detect(); return false">
+		<table>
+			<tbody>
+				<tr>
+					<td><nobr>BSSID / MAC:</nobr></td>
+					<td><input name="bssid" type="text" value="" pattern="([0-9A-Fa-f]{2}[:-]?){5}[0-9A-Fa-f]{2}" /></td>
+					<td><nobr> (like <tt>00:11:22:33:44:55</tt>)</nobr></td>
+				</tr>
+			</tbody>
+			<tbody>
+				<tr><td><input type=submit value="Detect" /></td><td></td></tr>
+			</tbody>
+		</table>
+		</form>
+		<br>
+		<table class=st1>
+			<tbody id=fhead></tbody>
+			<tbody id=fdata></tbody>
+		</table>
 	</td></tr>
 </table>
 
@@ -1391,6 +1886,7 @@ ZTE ZXHN H218N
     ADSL Modem/Router
 ZTE ZXHN H298N
   38:D8:2F:xx:xx:xx
+  54:BE:53:xx:xx:xx
   70:9F:2D:xx:xx:xx
   94:A7:B7:xx:xx:xx
   98:13:33:xx:xx:xx
@@ -1596,7 +2092,7 @@ Pin = 7141225</textarea>
 Technical details:
 Pin = 6817554</textarea>
 
-<textarea id=pinRealtek>Realtek firmwares
+<textarea id=pinRealtek1>Realtek firmwares
 TRENDnet TEW-432BRP (Realtek)
 TRENDnet TEW-432BRP/C (Realtek)
   00:14:D1:xx:xx:xx
@@ -1607,6 +2103,15 @@ Intellinet 503693 (Realtek)
 
 Technical details:
 Pin = 9566146</textarea>
+
+<textarea id=pinRealtek2>Netis WF2780
+  00:72:63:xx:xx:xx
+  E4:BE:ED:xx:xx:xx
+  WSC Device Names:
+    RTK_AP
+
+Technical details:
+Pin = 9571911</textarea>
 
 <textarea id=pinUpvel>Upvel (some firmwares)
 Upvel UR-315BN
@@ -1704,8 +2209,16 @@ Pin = 9575521</textarea>
 </div>
 </div>
 
+<div class=footer>&copy; 2015-2018 akokarev, binarymaster, Felis-Sapiens, Fusix</div>
 
-
-
+<div class=modal>
+	<div class=modal_bkg onclick="hideModal()"></div>
+	<div class=modal_cnt align=center id=win_login>
+	</div>
+	<div class=modal_cnt align=center id=win_reg>
+	</div>
+	<div class=modal_cnt align=center id=win_newpass>
+	</div>
+</div>
 </body>
 </html>

@@ -17,12 +17,20 @@ import org.apache.http.impl.client.*;
 import org.json.*;
 
 
+class WPSPin
+{
+    public int mode;
+    public String name;
+    public String pin;
+    public Boolean sugg;
+}
+
 public class WPSActivity extends Activity
 {
 	private WebView mWebView;
 
 	ArrayList<ItemWps> data = new ArrayList<ItemWps>();
-	String[] pinlist;
+	ArrayList<WPSPin> pins = new ArrayList<WPSPin>();
 	ProgressDialog pd=null;
 	private Settings mSettings;
     public static String SERVER_URI = "";
@@ -87,22 +95,18 @@ public class WPSActivity extends Activity
 		new GetPinsFromBase().execute(BSSDWps);
 		
 		mWebView = (WebView) findViewById(R.id.webView);
-		mWebView.addJavascriptInterface(new myJavascriptInterface(), "HtmlHandler");
+		mWebView.addJavascriptInterface(new myJavascriptInterface(), "JavaHandler");
 		mWebView.setWebViewClient(new WebViewClient(){
 				@Override
 				public void onPageFinished(WebView view, String url)
 				{
 					super.onPageFinished(view, url);
 					final String BSSDWps = getIntent().getExtras().getString("variable1");
-					mWebView.loadUrl("javascript:document.getElementById('bssids').innerHTML = '" + BSSDWps + "';pinSuggest()");
-					mWebView.loadUrl("javascript:window.HtmlHandler.handleHtml" +
-									 "(document.getElementById('result').value);");//js возвращает значение
-
+					mWebView.loadUrl("javascript:initAlgos();window.JavaHandler.initAlgos(JSON.stringify(algos),'" + BSSDWps + "');");
 				}
 			});
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.loadUrl("file:///android_asset/wpspin.html");
-
     }
 	private class GetPinsFromBase extends AsyncTask <String, Void, String>
 	{
@@ -201,7 +205,7 @@ public class WPSActivity extends Activity
 					public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id)
 					{
 						String pin = wpsPin.get(position);
-						Toast.makeText(getApplicationContext(), "Pin " + pin + " copied", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getApplicationContext(), "Pin \"" + pin + "\" copied", Toast.LENGTH_SHORT).show();
 						try
 						{
 							ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -224,13 +228,59 @@ public class WPSActivity extends Activity
 	}
 
 	
-private class myJavascriptInterface {
-		
-		@JavascriptInterface
-		public void handleHtml(String html) {
-			pinlist = html.split("\n");
-			
-		}
+private class myJavascriptInterface
+{
+    @JavascriptInterface
+    public void initAlgos(String json, String bssid)
+    {
+        pins.clear();
+        try
+        {
+            JSONArray arr = new JSONArray(json);
+
+            for (int i = 0; i < arr.length(); i++)
+            {
+                JSONObject obj = arr.getJSONObject(i);
+
+                WPSPin pin = new WPSPin();
+                pin.mode = obj.getInt("mode");
+                pin.name = obj.getString("name");
+                pins.add(pin);
+            }
+            mWebView.loadUrl("javascript:window.JavaHandler.getPins(1,JSON.stringify(pinSuggestAPI(true,'" + bssid + "',null)), '" + bssid + "');");
+        }
+        catch (JSONException e){}
+    }
+    @JavascriptInterface
+    public void getPins(int all, String json, String bssid)
+    {
+        try
+        {
+            JSONArray arr = new JSONArray(json);
+
+            for (int i = 0; i < arr.length(); i++)
+            {
+                JSONObject obj = arr.getJSONObject(i);
+                if (all > 0)
+                {
+                    WPSPin pin = pins.get(i);
+                    pin.pin = obj.getString("pin");
+                    pin.sugg = false;
+                }
+                else
+                {
+                    WPSPin pin = pins.get(obj.getInt("algo"));
+                    pin.sugg = true;
+                }
+            }
+            if (all > 0)
+                mWebView.loadUrl("javascript:window.JavaHandler.getPins(0,JSON.stringify(pinSuggestAPI(false,'" + bssid + "',null)), '');");
+        }
+        catch (JSONException e)
+        {
+            pins.clear();
+        }
+    }
 }
 
 
@@ -244,29 +294,32 @@ private class myJavascriptInterface {
 		wpsPin.clear();
 		wpsMet.clear();
 		data.clear();
-		String p1 = null,p2=null;
-		String sug="";
 
-		for (int i=0; i<pinlist.length; i++){
-		
-			if (pinlist[i].length()>7){
-
-				p1=pinlist[i].substring(0,8);
-				p2=pinlist[i].substring(10);
-				if (!wpsPin.contains(p1)){
-				if (p1.equals("Suggeste"))sug="✔";
-				if (p1.equals("Generate"))sug="";
-				if (!p1.equals("Generate") & !p1.equals("Suggeste")){
-			wpsPin.add(p1);
-			wpsMet.add(p2);
-				data.add(new ItemWps(p1, p2, "---", sug));}}
-			}
-		
-			
-		
-		}
+        for (WPSPin pin : pins)
+        {
+            if (!pin.sugg) continue;
+            wpsPin.add(pin.pin);
+            wpsMet.add(pin.name);
+            data.add(new ItemWps(
+                    pin.pin.equals("") ? "<empty>" : pin.pin,
+                    pin.name,
+                    pin.mode == 3 ? "STA" : "",
+                    "✔"
+            ));
+        }
+        for (WPSPin pin : pins)
+        {
+            if (pin.sugg) continue;
+            wpsPin.add(pin.pin);
+            wpsMet.add(pin.name);
+            data.add(new ItemWps(
+                    pin.pin.equals("") ? "<empty>" : pin.pin,
+                    pin.name,
+                    pin.mode == 3 ? "STA" : "",
+                    ""
+            ));
+        }
 		wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
-
 	}
 
 	public void btnLocalClick(View view)
