@@ -4,6 +4,7 @@ import android.app.*;
 import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
+import android.graphics.*;
 import android.os.*;
 import android.view.*;
 import android.webkit.*;
@@ -14,7 +15,6 @@ import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
 import org.json.*;
-import android.graphics.*;
 
 
 public class WPSActivity extends Activity
@@ -77,12 +77,12 @@ public class WPSActivity extends Activity
 
 		ActionBar actionBar = getActionBar(); actionBar.hide();
 
-		TextView ESSDWpsText = (TextView) findViewById(R.id.ESSDWpsTextView);
+		TextView ESSDWpsText = (TextView)findViewById(R.id.ESSDWpsTextView);
 		String ESSDWps = getIntent().getExtras().getString("variable");
-		ESSDWpsText.setText(ESSDWps); // ESSD
-		TextView BSSDWpsText = (TextView) findViewById(R.id.BSSDWpsTextView);
+		ESSDWpsText.setText(ESSDWps); // ESSID
+		TextView BSSDWpsText = (TextView)findViewById(R.id.BSSDWpsTextView);
 		final String BSSDWps = getIntent().getExtras().getString("variable1");
-		BSSDWpsText.setText(BSSDWps); // BSSD
+		BSSDWpsText.setText(BSSDWps); // BSSID
 
 		new GetPinsFromBase().execute(BSSDWps);
 		
@@ -110,13 +110,13 @@ public class WPSActivity extends Activity
 		protected void onPreExecute()
 		{
 			super.onPreExecute();
-			pd = ProgressDialog.show(WPSActivity.this, "Waiting...", "getting pins...");
+			pd = ProgressDialog.show(WPSActivity.this, "Please wait...", "Getting pins...");
 		}
 
 
 		protected String doInBackground(String[] BSSDWps)
 		{
-			String BSSID=BSSDWps[0];
+			String BSSID = BSSDWps[0];
 			String response = "";
 			String response2 = "";
 			data.clear();
@@ -134,13 +134,11 @@ public class WPSActivity extends Activity
 			{
 				response2 = hc2.execute(http2, res2);
 				response2 = response2.substring(response2.indexOf("muted'><center>") + 15, response2.indexOf("<center></h4><h6"));
-
-
 			}
 			catch (Exception e)
 			{}
 
-			HttpGet http = new HttpGet("http://3wifi.stascorp.com/api/apiwps?key=" + API_READ_KEY + "&bssid=" + BSSID);
+			HttpGet http = new HttpGet(SERVER_URI + "/api/apiwps?key=" + API_READ_KEY + "&bssid=" + BSSID);
 			try
 			{
 				response = hc.execute(http, res);
@@ -166,17 +164,16 @@ public class WPSActivity extends Activity
 					}
 					else
 					{wpsDb.add("");}
-					Integer score=Math.round(Float.parseFloat(wpsScore.get(i)) * 100);
+					Integer score = Math.round(Float.parseFloat(wpsScore.get(i)) * 100);
 					wpsScore.set(i, Integer.toString(score) + "%");
 
-
 					data.add(new ItemWps(wpsPin.get(i), wpsMet.get(i), wpsScore.get(i), wpsDb.get(i)));
-
 				}
-
 			}
 			catch (JSONException e)
-			{e.printStackTrace();}
+			{
+			    e.printStackTrace();
+			}
 
 			return response2;
 		}
@@ -186,23 +183,25 @@ public class WPSActivity extends Activity
 		{
 
 			pd.dismiss();
-			ListView wpslist = (ListView) findViewById(R.id.WPSlist);
+			ListView wpslist = (ListView)findViewById(R.id.WPSlist);
 			if (data.isEmpty())
-			{data.add(new ItemWps(null, "   not found", null, null));
-				wpslist.setEnabled(false);}
+			{
+				data.add(new ItemWps(null, "   not found", null, null));
+				wpslist.setEnabled(false);
+			}
 
 			wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
-			TextView VendorWpsText = (TextView) findViewById(R.id.VendorWpsTextView);
+			TextView VendorWpsText = (TextView)findViewById(R.id.VendorWpsTextView);
 			if (response2.length() > 50)
-			{response2 = "unkown vendor";}
+			{response2 = "unknown vendor";}
 			VendorWpsText.setText(response2);
 
 			wpslist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 					@Override
 					public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id)
 					{
-						String pin=wpsPin.get(position);
-						Toast.makeText(getApplicationContext(), "pin " + pin + " copied", Toast.LENGTH_SHORT).show();
+						String pin = wpsPin.get(position);
+						Toast.makeText(getApplicationContext(), "Pin " + pin + " copied", Toast.LENGTH_SHORT).show();
 						try
 						{
 							ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -306,6 +305,4 @@ private class myJavascriptInterface {
 									 text, Toast.LENGTH_LONG);
 		toast.show();
 	}
-
-
 }
