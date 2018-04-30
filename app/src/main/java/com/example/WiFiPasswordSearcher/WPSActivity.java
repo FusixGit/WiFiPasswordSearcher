@@ -321,6 +321,30 @@ public class WPSActivity extends Activity
         toastMessage("Selected source: WPS PIN Companion");
     }
 
+    private int findAlgoByPin(String pin)
+    {
+        int i = 0;
+        for (WPSPin p : pins)
+        {
+            if (pin.equals(p.pin))
+                return i;
+            i++;
+        }
+        return -1;
+    }
+
+    private int findAlgoByName(String name)
+    {
+        int i = 0;
+        for (WPSPin p : pins)
+        {
+            if (name.equals(p.name))
+                return i;
+            i++;
+        }
+        return -1;
+    }
+
     public void btnLocalClick(View view)
     { //локальная база
         findViewById(R.id.wpsButton2).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
@@ -336,9 +360,61 @@ public class WPSActivity extends Activity
             wpsPin.clear();
             Cursor cursor = mDb.rawQuery("SELECT * FROM pins WHERE mac='" + BSSDWps.substring(0, 8) + "'", null);
             cursor.moveToFirst();
+
             do {
-                data.add(new ItemWps(cursor.getString(0), "---", "---", "---"));
-                wpsPin.add(cursor.getString(0));
+                String p = cursor.getString(0);
+                if (p.equals("vacante"))
+                    p = ""; // empty pin
+                int idx = findAlgoByPin(p);
+
+                if (idx == -1)
+                {
+                    if (p.equals("airocon"))
+                        idx = findAlgoByName("Airocon Realtek");
+                    else if (p.equals("arcady"))
+                        idx = findAlgoByName("Livebox Arcadyan");
+                    else if (p.equals("asus"))
+                        idx = findAlgoByName("ASUS PIN");
+                    else if (p.equals("dlink"))
+                        idx = findAlgoByName("D-Link PIN");
+                    else if (p.equals("dlink1"))
+                        idx = findAlgoByName("D-Link PIN +1");
+                    else if (p.equals("thirtytwo"))
+                        idx = findAlgoByName("32-bit PIN");
+                    //else if (p.equals("trend"))
+                    //    idx = findAlgoByName(""); // unknown
+                    else if (p.equals("twentyeight"))
+                        idx = findAlgoByName("28-bit PIN");
+                    else if (p.equals("zhao"))
+                        idx = findAlgoByName("24-bit PIN");
+
+                    if (idx > -1)
+                    {
+                        WPSPin algo = pins.get(idx);
+                        p = algo.pin;
+                    }
+                }
+
+                if (idx > -1)
+                {
+                    WPSPin algo = pins.get(idx);
+                    data.add(new ItemWps(
+                        p.equals("") ? "<empty>" : p,
+                        algo.name,
+                        algo.mode == 3 ? "STA" : "",
+                        ""
+                    ));
+                }
+                else
+                {
+                    data.add(new ItemWps(
+                            p.equals("") ? "<empty>" : p,
+                            "Unknown",
+                            p.matches("[0-9]+") ? "STA" : "",
+                            ""
+                    ));
+                }
+                wpsPin.add(p);
             }
             while(cursor.moveToNext());
             cursor.close();
