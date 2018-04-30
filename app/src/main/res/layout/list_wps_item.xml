@@ -41,6 +41,8 @@
 				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:text="Linear sequence"
 				android:gravity="center_vertical"
+				android:maxLines="1"
+				android:ellipsize="end"
 				android:id="@+id/txtMetod"/>
 
 			<TextView

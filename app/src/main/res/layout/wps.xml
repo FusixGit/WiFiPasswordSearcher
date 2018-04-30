@@ -15,7 +15,7 @@
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
-			android:text="3Wifi base"
+			android:text="3WiFi Base"
 			android:layout_weight="1.0"
 			android:onClick="btnwpsbaseclick"
 			android:id="@+id/baseButton"/>
@@ -23,7 +23,7 @@
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
-			android:text="generate"
+			android:text="Generate"
 			android:layout_weight="1.0"
 			android:onClick="btnGenerate"
 			android:id="@+id/wpsButton1"/>
@@ -31,7 +31,7 @@
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
-			android:text="local"
+			android:text="Local"
 			android:layout_weight="1.0"
 			android:onClick="btnLocalClick"
 			android:id="@+id/wpsButton2"/>
