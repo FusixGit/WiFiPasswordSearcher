@@ -91,8 +91,6 @@ public class WPSActivity extends Activity
         final String BSSDWps = getIntent().getExtras().getString("variable1");
         BSSDWpsText.setText(BSSDWps); // BSSID
 
-        new GetPinsFromBase().execute(BSSDWps);
-        
         mWebView = (WebView) findViewById(R.id.webView);
         mWebView.addJavascriptInterface(new myJavascriptInterface(), "JavaHandler");
         mWebView.setWebViewClient(new WebViewClient()
@@ -107,6 +105,20 @@ public class WPSActivity extends Activity
         });
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadUrl("file:///android_asset/wpspin.html");
+
+        int src = mSettings.AppSettings.getInt(Settings.WPS_SOURCE, 1);
+        switch (src)
+        {
+            case 1:
+                btnwpsbaseclick(null);
+                break;
+            case 2:
+                btnGenerate(null);
+                break;
+            case 3:
+                btnLocalClick(null);
+                break;
+        }
     }
     private class GetPinsFromBase extends AsyncTask <String, Void, String>
     {
@@ -222,6 +234,8 @@ public class WPSActivity extends Activity
         findViewById(R.id.baseButton).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
         findViewById(R.id.wpsButton1).getBackground().clearColorFilter();
         findViewById(R.id.wpsButton2).getBackground().clearColorFilter();
+        mSettings.Editor.putInt(Settings.WPS_SOURCE, 1);
+        mSettings.Editor.commit();
         String BSSDWps = getIntent().getExtras().getString("variable1");
         new GetPinsFromBase().execute(BSSDWps);
     }
@@ -287,6 +301,8 @@ public class WPSActivity extends Activity
         findViewById(R.id.wpsButton1).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
         findViewById(R.id.baseButton).getBackground().clearColorFilter();
         findViewById(R.id.wpsButton2).getBackground().clearColorFilter();
+        mSettings.Editor.putInt(Settings.WPS_SOURCE, 2);
+        mSettings.Editor.commit();
         ListView wpslist = (ListView) findViewById(R.id.WPSlist);
         wpslist.setAdapter(null);
         wpsPin.clear();
@@ -350,6 +366,8 @@ public class WPSActivity extends Activity
         findViewById(R.id.wpsButton2).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
         findViewById(R.id.wpsButton1).getBackground().clearColorFilter();
         findViewById(R.id.baseButton).getBackground().clearColorFilter();
+        mSettings.Editor.putInt(Settings.WPS_SOURCE, 3);
+        mSettings.Editor.commit();
         ListView wpslist = (ListView) findViewById(R.id.WPSlist);
         wpslist.setAdapter(null);
         final String BSSDWps = getIntent().getExtras().getString("variable1");
