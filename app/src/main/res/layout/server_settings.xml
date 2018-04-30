@@ -26,6 +26,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:id="@+id/txt_settings_3wifi_login"
+			android:inputType="textNoSuggestions"
+			android:singleLine="true"
 			android:layout_weight="1"/>
 
 	</LinearLayout>
@@ -49,6 +51,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:id="@+id/txt_settings_3wifi_password"
+			android:inputType="textNoSuggestions"
+			android:singleLine="true"
 			android:layout_weight="1"/>
 
 	</LinearLayout>
@@ -72,6 +76,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:id="@+id/txt_settings_3wifi_server"
+			android:inputType="textNoSuggestions"
+			android:singleLine="true"
 			android:layout_weight="1"/>
 
 	</LinearLayout>

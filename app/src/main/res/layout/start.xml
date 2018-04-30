@@ -55,6 +55,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="12dp"
 				android:id="@+id/edtLogin"
+				android:inputType="textNoSuggestions"
 				android:maxLines="1"
 				android:singleLine="true"/>
 
@@ -80,6 +81,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="12dp"
 				android:id="@+id/edtPassword"
+				android:inputType="textNoSuggestions"
 				android:password="true"
 				android:maxLines="1"
 				android:singleLine="true"/>
