@@ -16,6 +16,8 @@ import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
 import org.json.*;
 
+import static java.lang.Thread.sleep;
+
 
 class WPSPin
 {
@@ -43,13 +45,13 @@ public class WPSActivity extends Activity
 
     private DatabaseHelper mDBHelper;
     private SQLiteDatabase mDb;
+    private volatile boolean wpsReady = false;
 
 
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wps);
-        findViewById(R.id.baseButton).getBackground().setColorFilter(Color.parseColor("#1cd000"), PorterDuff.Mode.MULTIPLY);
 
         mDBHelper = new DatabaseHelper(this);
         try
@@ -69,7 +71,6 @@ public class WPSActivity extends Activity
         {
             throw mSQLException;
         }
-
 
         if (android.os.Build.VERSION.SDK_INT > 9)
         {
@@ -91,6 +92,25 @@ public class WPSActivity extends Activity
         final String BSSDWps = getIntent().getExtras().getString("variable1");
         BSSDWpsText.setText(BSSDWps); // BSSID
 
+        ListView wpslist = (ListView)findViewById(R.id.WPSlist);
+        wpslist.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id)
+            {
+                String pin = wpsPin.get(position);
+                Toast.makeText(getApplicationContext(), "Pin \"" + pin + "\" copied", Toast.LENGTH_SHORT).show();
+                try
+                {
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    ClipData dataClip = ClipData.newPlainText("text", pin);
+                    clipboard.setPrimaryClip(dataClip);
+                }
+                catch (Exception e)
+                {}
+            }
+        });
+
         mWebView = (WebView) findViewById(R.id.webView);
         mWebView.addJavascriptInterface(new myJavascriptInterface(), "JavaHandler");
         mWebView.setWebViewClient(new WebViewClient()
@@ -106,42 +126,24 @@ public class WPSActivity extends Activity
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadUrl("file:///android_asset/wpspin.html");
 
-        int src = mSettings.AppSettings.getInt(Settings.WPS_SOURCE, 1);
-        switch (src)
-        {
-            case 1:
-                btnwpsbaseclick(null);
-                break;
-            case 2:
-                btnGenerate(null);
-                break;
-            case 3:
-                btnLocalClick(null);
-                break;
-        }
+        new AsyncInitActivity().execute(BSSDWps);
     }
-    private class GetPinsFromBase extends AsyncTask <String, Void, String>
+
+    private class AsyncInitActivity extends AsyncTask <String, Void, String>
     {
         @Override
         protected void onPreExecute()
         {
             super.onPreExecute();
-            pd = ProgressDialog.show(WPSActivity.this, "Please wait...", "Getting pins...");
+            pd = ProgressDialog.show(WPSActivity.this, "Please wait...", "Initializing...");
         }
 
         protected String doInBackground(String[] BSSDWps)
         {
+            // get MAC manufacturer
             String BSSID = BSSDWps[0];
-            String response = "";
             String response2 = "";
-            data.clear();
-            wpsScore.clear();
-            wpsDb.clear();
-            wpsPin.clear();
-            wpsMet.clear();
-            DefaultHttpClient hc = new DefaultHttpClient();
             DefaultHttpClient hc2 = new DefaultHttpClient();
-            ResponseHandler<String> res = new BasicResponseHandler();
             ResponseHandler<String> res2 = new BasicResponseHandler();
 
             HttpPost http2 = new HttpPost("http://wpsfinder.com/ethernet-wifi-brand-lookup/MAC:" + BSSID);
@@ -152,6 +154,76 @@ public class WPSActivity extends Activity
             }
             catch (Exception e)
             {}
+
+            while (!wpsReady)
+            {
+                try
+                {
+                    Thread.sleep(100);
+                }
+                catch (Exception e) {}
+            }
+
+            return response2;
+        }
+
+        @Override
+        protected void onPostExecute(String response2)
+        {
+            int src = mSettings.AppSettings.getInt(Settings.WPS_SOURCE, 1);
+            if (src != 1)
+                pd.dismiss();
+            TextView VendorWpsText = (TextView)findViewById(R.id.VendorWpsTextView);
+            if (response2.length() > 50)
+            {
+                response2 = "unknown vendor";
+            }
+            VendorWpsText.setText(response2);
+
+            switch (src)
+            {
+                case 1:
+                    btnwpsbaseclick(null);
+                    break;
+                case 2:
+                    btnGenerate(null);
+                    break;
+                case 3:
+                    btnLocalClick(null);
+                    break;
+            }
+        }
+    }
+
+    private class GetPinsFromBase extends AsyncTask <String, Void, String>
+    {
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            String msg = "Getting pins...";
+
+            if (pd.isShowing())
+            {
+                pd.setMessage(msg);
+            }
+            else
+            {
+                pd = ProgressDialog.show(WPSActivity.this, "Please wait...", msg);
+            }
+        }
+
+        protected String doInBackground(String[] BSSDWps)
+        {
+            String BSSID = BSSDWps[0];
+            String response = "";
+            data.clear();
+            wpsScore.clear();
+            wpsDb.clear();
+            wpsPin.clear();
+            wpsMet.clear();
+            DefaultHttpClient hc = new DefaultHttpClient();
+            ResponseHandler<String> res = new BasicResponseHandler();
 
             HttpGet http = new HttpGet(SERVER_URI + "/api/apiwps?key=" + API_READ_KEY + "&bssid=" + BSSID);
             try
@@ -185,13 +257,12 @@ public class WPSActivity extends Activity
                 e.printStackTrace();
             }
 
-            return response2;
+            return "";
         }
 
         @Override
-        protected void onPostExecute(String response2)
+        protected void onPostExecute(String str)
         {
-
             pd.dismiss();
             ListView wpslist = (ListView)findViewById(R.id.WPSlist);
             if (data.isEmpty())
@@ -201,31 +272,7 @@ public class WPSActivity extends Activity
             }
 
             wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
-            TextView VendorWpsText = (TextView)findViewById(R.id.VendorWpsTextView);
-            if (response2.length() > 50)
-            {
-                response2 = "unknown vendor";
-            }
-            VendorWpsText.setText(response2);
             toastMessage("Selected source: 3WiFi Online WPS PIN");
-
-            wpslist.setOnItemClickListener(new AdapterView.OnItemClickListener()
-            {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id)
-                {
-                    String pin = wpsPin.get(position);
-                    Toast.makeText(getApplicationContext(), "Pin \"" + pin + "\" copied", Toast.LENGTH_SHORT).show();
-                    try
-                    {
-                        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                        ClipData dataClip = ClipData.newPlainText("text", pin);
-                        clipboard.setPrimaryClip(dataClip);
-                    }
-                    catch (Exception e)
-                    {}
-                }
-            });
         }
     }
 
@@ -261,7 +308,10 @@ public class WPSActivity extends Activity
                 }
                 mWebView.loadUrl("javascript:window.JavaHandler.getPins(1,JSON.stringify(pinSuggestAPI(true,'" + bssid + "',null)), '" + bssid + "');");
             }
-            catch (JSONException e){}
+            catch (JSONException e)
+            {
+                wpsReady = true;
+            }
         }
 
         @JavascriptInterface
@@ -288,10 +338,13 @@ public class WPSActivity extends Activity
                 }
                 if (all > 0)
                     mWebView.loadUrl("javascript:window.JavaHandler.getPins(0,JSON.stringify(pinSuggestAPI(false,'" + bssid + "',null)), '');");
+                else
+                    wpsReady = true;
             }
             catch (JSONException e)
             {
                 pins.clear();
+                wpsReady = true;
             }
         }
     }
