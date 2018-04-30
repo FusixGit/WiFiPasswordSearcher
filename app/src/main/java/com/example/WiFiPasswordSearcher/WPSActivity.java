@@ -199,6 +199,7 @@ public class WPSActivity extends Activity
 			if (response2.length() > 50)
 			{response2 = "unknown vendor";}
 			VendorWpsText.setText(response2);
+            toastMessage("Selected source: 3WiFi Online WPS PIN");
 
 			wpslist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 					@Override
@@ -320,6 +321,7 @@ private class myJavascriptInterface
             ));
         }
 		wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
+        toastMessage("Selected source: WPS PIN Companion");
 	}
 
 	public void btnLocalClick(View view)
@@ -349,6 +351,7 @@ private class myJavascriptInterface
 		wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
 
 		wpslist.setEnabled(true);
+        toastMessage("Selected source: WPA WPS TESTER");
 	}
 
 	//Toast
