@@ -728,7 +728,6 @@ public class MyActivity extends Activity {
             Connection.setDoOutput(true);
             Connection.setRequestProperty("Content-Type", "application/json");
 
-            OutputStream os = Connection.getOutputStream();
             DataOutputStream writer = new DataOutputStream(
                     Connection.getOutputStream());
             writer.writeBytes(query.toString());
@@ -742,46 +741,65 @@ public class MyActivity extends Activity {
                 RawData += ReadLine;
             }
 
-            JSONObject json = new JSONObject(RawData);
-            Boolean ret = json.getBoolean("result");
-
-            if (!ret)
+            try
             {
-                // API failure
-                String error = json.getString("error");
-                final String errorDesc = User.GetErrorDesc(error);
+                JSONObject json = new JSONObject(RawData);
+                Boolean ret = json.getBoolean("result");
 
-                if (error != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast t = Toast.makeText(getApplicationContext(), errorDesc, Toast.LENGTH_SHORT);
-                            t.show();
-                        }
-                    });
-                }
-                if (error.equals("loginfail"))
+                if (!ret)
                 {
-                    mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, false);
-                    mSettings.Editor.commit();
-                    API_KEYS_VALID = false;
-                    ApiDataTest();
+                    // API failure
+                    String error = json.getString("error");
+                    final String errorDesc = User.GetErrorDesc(error);
+
+                    if (error.equals("loginfail"))
+                    {
+                        mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, false);
+                        mSettings.Editor.commit();
+                        API_KEYS_VALID = false;
+                        ApiDataTest();
+                        return;
+                    }
+                    if (error != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast t = Toast.makeText(getApplicationContext(), errorDesc, Toast.LENGTH_SHORT);
+                                t.show();
+                                btnCheckFromBase.setEnabled(true);
+                            }
+                        });
+                    }
+                    return;
                 }
-                return;
+                if (!json.isNull("data"))
+                {
+                    bss = json.getJSONObject("data");
+                }
             }
-            if (!json.isNull("data"))
+            catch (Exception e)
             {
-                bss = json.getJSONObject("data");
+                // JSON error
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast t = Toast.makeText(getApplicationContext(), "Database failure", Toast.LENGTH_SHORT);
+                        t.show();
+                        btnCheckFromBase.setEnabled(true);
+                    }
+                });
+                return;
             }
         }
         catch (Exception e)
         {
-            // Connection or JSON error
+            // Connection error
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast t = Toast.makeText(getApplicationContext(), "Connection error", Toast.LENGTH_SHORT);
+                    Toast t = Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT);
                     t.show();
+                    btnCheckFromBase.setEnabled(true);
                 }
             });
             return;
