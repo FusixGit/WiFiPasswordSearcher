@@ -7,9 +7,8 @@
 
 	<LinearLayout
 		android:orientation="horizontal"
-		android:layout_width="0dp"
+		android:layout_width="fill_parent"
 		android:layout_height="63dp"
-		android:layout_weight="100"
 		android:clickable="false"
 		android:focusable="false"
 		android:focusableInTouchMode="false">
@@ -18,8 +17,8 @@
 			android:orientation="horizontal"
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
-			android:layout_weight="75"
-			android:weightSum="1">
+			android:layout_weight="1.2"
+			android:layout_gravity="left">
 
 			<LinearLayout
 				android:orientation="vertical"
@@ -90,10 +89,10 @@
 
 		<LinearLayout
 			android:orientation="horizontal"
-			android:layout_width="wrap_content"
+			android:layout_width="0dp"
 			android:layout_height="match_parent"
-			android:layout_weight="29.58"
-			android:weightSum="1">
+			android:layout_weight="1"
+			android:layout_gravity="right">
 
 			<LinearLayout
 				android:id="@+id/llKeys"
@@ -112,8 +111,8 @@
 					android:layout_centerVertical="true"
 					android:textIsSelectable="false"
 					android:elegantTextHeight="false"
-					android:ellipsize="none"
-					android:maxLines="100"
+					android:ellipsize="end"
+					android:maxLines="1"
 					android:scrollHorizontally="false"/>
 
 				<TextView
@@ -134,7 +133,7 @@
 				android:id="@+id/txtKeysCount"
 				android:textIsSelectable="false"
 				android:gravity="center_vertical"
-				android:paddingRight="21dp"/>
+				android:paddingRight="18dp"/>
 
 		</LinearLayout>
 
