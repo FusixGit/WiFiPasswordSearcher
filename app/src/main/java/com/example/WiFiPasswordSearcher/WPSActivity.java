@@ -153,7 +153,9 @@ public class WPSActivity extends Activity
                 response2 = response2.substring(response2.indexOf("muted'><center>") + 15, response2.indexOf("<center></h4><h6"));
             }
             catch (Exception e)
-            {}
+            {
+                response2 = "N/A";
+            }
 
             while (!wpsReady)
             {
@@ -216,7 +218,7 @@ public class WPSActivity extends Activity
         protected String doInBackground(String[] BSSDWps)
         {
             String BSSID = BSSDWps[0];
-            String response = "";
+            String response;
             data.clear();
             wpsScore.clear();
             wpsDb.clear();
@@ -229,35 +231,37 @@ public class WPSActivity extends Activity
             try
             {
                 response = hc.execute(http, res);
-            }
-            catch (Exception e)
-            {}
-            try
-            {
-                JSONObject jObject = new JSONObject(response);
-                jObject = jObject.getJSONObject("data");
-                jObject = jObject.getJSONObject(BSSID);
 
-                JSONArray array =jObject.optJSONArray("scores");
-                for (int i = 0; i < array.length(); i++)
+                try
                 {
-                    jObject = array.getJSONObject(i);
-                    wpsPin.add(jObject.getString("value"));
-                    wpsMet.add(jObject.getString("name"));
-                    wpsScore.add(jObject.getString("score"));
-                    wpsDb.add(jObject.getBoolean("fromdb") ? "✔" : "");
-                    Integer score = Math.round(Float.parseFloat(wpsScore.get(i)) * 100);
-                    wpsScore.set(i, Integer.toString(score) + "%");
+                    JSONObject jObject = new JSONObject(response);
+                    jObject = jObject.getJSONObject("data");
+                    jObject = jObject.getJSONObject(BSSID);
 
-                    data.add(new ItemWps(wpsPin.get(i), wpsMet.get(i), wpsScore.get(i), wpsDb.get(i)));
+                    JSONArray array =jObject.optJSONArray("scores");
+                    for (int i = 0; i < array.length(); i++)
+                    {
+                        jObject = array.getJSONObject(i);
+                        wpsPin.add(jObject.getString("value"));
+                        wpsMet.add(jObject.getString("name"));
+                        wpsScore.add(jObject.getString("score"));
+                        wpsDb.add(jObject.getBoolean("fromdb") ? "✔" : "");
+                        Integer score = Math.round(Float.parseFloat(wpsScore.get(i)) * 100);
+                        wpsScore.set(i, Integer.toString(score) + "%");
+
+                        data.add(new ItemWps(wpsPin.get(i), wpsMet.get(i), wpsScore.get(i), wpsDb.get(i)));
+                    }
+                }
+                catch (JSONException e)
+                {
+                    response = "json_error";
                 }
             }
-            catch (JSONException e)
+            catch (Exception e)
             {
-                e.printStackTrace();
+                response = "http_error";
             }
-
-            return "";
+            return response;
         }
 
         @Override
@@ -265,14 +269,30 @@ public class WPSActivity extends Activity
         {
             pd.dismiss();
             ListView wpslist = (ListView)findViewById(R.id.WPSlist);
-            if (data.isEmpty())
+            String msg = "";
+            Boolean toast = true;
+            if (str.equals("http_error"))
             {
-                data.add(new ItemWps(null, "   not found", null, null));
+                msg = "No internet connection";
+                toast = false;
+            }
+            else if (str.equals("json_error"))
+            {
+                msg = "Database failure";
+                toast = false;
+            }
+            else if (data.isEmpty())
+            {
+                msg = "No pins found";
+            }
+            if (msg.length() > 0)
+            {
+                data.add(new ItemWps(null, msg, null, null));
                 wpslist.setEnabled(false);
             }
 
             wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
-            toastMessage("Selected source: 3WiFi Online WPS PIN");
+            if (toast) toastMessage("Selected source: 3WiFi Online WPS PIN");
         }
     }
 
@@ -492,7 +512,7 @@ public class WPSActivity extends Activity
         }
         catch (Exception e)
         {
-            data.add(new ItemWps(null, "   not found", null, null));
+            data.add(new ItemWps(null, "No pins found", null, null));
         }
         wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
 
