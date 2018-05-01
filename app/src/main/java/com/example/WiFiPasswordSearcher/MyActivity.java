@@ -19,15 +19,16 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.larvalabs.svgandroid.SVG;
 import com.larvalabs.svgandroid.SVGParser;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -286,6 +287,7 @@ public class MyActivity extends Activity {
      */
 
     private Settings mSettings;
+    private UserManager User;
 
     public static String APP_VERSION = "";
     public static String SERVER_LOGIN = "";
@@ -606,6 +608,7 @@ public class MyActivity extends Activity {
         APP_VERSION = getResources().getString(R.string.app_version);
 
         mSettings = new Settings(getApplicationContext());
+        User = new UserManager(getApplicationContext());
 
         SERVER_LOGIN = mSettings.AppSettings.getString(Settings.APP_SERVER_LOGIN, "");
         SERVER_PASSWORD = mSettings.AppSettings.getString(Settings.APP_SERVER_PASSWORD, "antichat");
@@ -704,13 +707,92 @@ public class MyActivity extends Activity {
 
     private void CheckFromBase()
     {
+        JSONObject bss = new JSONObject();
+        BufferedReader Reader = null;
+        String ReadLine = "";
+        String RawData = "";
+
+        try {
+            JSONObject query = new JSONObject();
+            query.put("key", API_READ_KEY);
+            JSONArray bssids = new JSONArray();
+            for (ScanResult result : WiFiScanResult) {
+                bssids.put(result.BSSID);
+            }
+            query.put("bssid", bssids);
+
+            URL Uri = new URL(SERVER_URI + "/api/apiquery");
+
+            HttpURLConnection Connection = (HttpURLConnection) Uri.openConnection();
+            Connection.setRequestMethod("POST");
+            Connection.setDoOutput(true);
+            Connection.setRequestProperty("Content-Type", "application/json");
+
+            OutputStream os = Connection.getOutputStream();
+            DataOutputStream writer = new DataOutputStream(
+                    Connection.getOutputStream());
+            writer.writeBytes(query.toString());
+
+            Connection.setReadTimeout(10 * 1000);
+            Connection.connect();
+
+            Reader = new BufferedReader(new InputStreamReader(Connection.getInputStream()));
+
+            while ((ReadLine = Reader.readLine()) != null) {
+                RawData += ReadLine;
+            }
+
+            JSONObject json = new JSONObject(RawData);
+            Boolean ret = json.getBoolean("result");
+
+            if (!ret)
+            {
+                // API failure
+                String error = json.getString("error");
+                final String errorDesc = User.GetErrorDesc(error);
+
+                if (error != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast t = Toast.makeText(getApplicationContext(), errorDesc, Toast.LENGTH_SHORT);
+                            t.show();
+                        }
+                    });
+                }
+                if (error.equals("loginfail"))
+                {
+                    mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, false);
+                    mSettings.Editor.commit();
+                    API_KEYS_VALID = false;
+                    ApiDataTest();
+                }
+                return;
+            }
+            if (!json.isNull("data"))
+            {
+                bss = json.getJSONObject("data");
+            }
+        }
+        catch (Exception e)
+        {
+            // Connection or JSON error
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast t = Toast.makeText(getApplicationContext(), "Connection error", Toast.LENGTH_SHORT);
+                    t.show();
+                }
+            });
+            return;
+        }
+
         ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
         HashMap<String, String> ElemWiFi;
         String KeyColor;
         int i = 0;
         for (ScanResult result : WiFiScanResult) {
-            APData apdata = GetWiFiKeyByBSSID(result.SSID, result.BSSID);
-            if (apdata == null) break;
+            APData apdata = GetWiFiKeyByBSSID(bss, result.SSID, result.BSSID.toUpperCase());
 
             ElemWiFi = new HashMap<String, String>();
             ElemWiFi.put("ESSID", result.SSID);
@@ -772,60 +854,25 @@ public class MyActivity extends Activity {
         return Key;
     }
 
-    public APData GetWiFiKeyByBSSID(String ESSID, String BSSID)
+    public APData GetWiFiKeyByBSSID(JSONObject bss, String ESSID, String BSSID)
     {
-        String response = "";
-        JSONObject jObject = null;
-        DefaultHttpClient hc;
-        hc = new DefaultHttpClient();
-        ResponseHandler<String> res = new BasicResponseHandler();
-        String sUrl = SERVER_URI+"/api/ajax.php";
-        String sGetRequest = "?Version="+APP_VERSION+"&Key="+API_READ_KEY+"&Query=Find&BSSID="+BSSID;
-
-        try {
-            HttpGet http = new HttpGet(sUrl+sGetRequest);
-            response = hc.execute(http, res);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
         ArrayList<String> keys = new ArrayList<String>();
         ArrayList<Boolean> gen = new ArrayList<Boolean>();
         ArrayList<String> wpsPins = new ArrayList<String>();
 
         try {
-            jObject = new JSONObject(response);
-            boolean Successes = jObject.getBoolean("Successes");
+            boolean Successes = !bss.isNull(BSSID);
             if (Successes)
             {
-                JSONArray keysJSON = jObject.getJSONArray("Keys");
-                JSONArray JsonWPSPins = jObject.getJSONArray("WPS");
+                JSONArray rows = bss.getJSONArray(BSSID);
 
-                for (int i = 0; i < keysJSON.length(); i++)
+                for (int i = 0; i < rows.length(); i++)
                 {
-                    keys.add(keysJSON.getString(i));
+                    JSONObject row = rows.getJSONObject(i);
+                    keys.add(row.getString("key"));
                     gen.add(false);
-                    if (JsonWPSPins.getInt(i) == -1) wpsPins.add("");
-                    else wpsPins.add(Integer.toString(JsonWPSPins.getInt(i)));
-                }
-            }
-            else {
-                JSONObject error = jObject.getJSONObject("Error");
-                String errorDesc = error.getString("Desc");
-                Integer errorCode = error.getInt("Code");
-
-                if (error != null)
-                {
-
-                    if (errorCode == -100)
-                    {
-                        mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, false);
-                        mSettings.Editor.commit();
-                        API_KEYS_VALID = false;
-                        ApiDataTest();
-                        return null;
-                    }
+                    String wps = row.getString("wps");
+                    if (!wps.equals("")) wpsPins.add(wps);
                 }
             }
         } catch (JSONException e) {
@@ -835,7 +882,7 @@ public class MyActivity extends Activity {
         if (keys.size() == 0)
         {
             String PassiveKey = PassiveVulnerabilityTest(ESSID, BSSID);
-            if (PassiveKey != "")
+            if (PassiveKey.length() != 0)
             {
                 keys.add(PassiveKey);
                 gen.add(true);
