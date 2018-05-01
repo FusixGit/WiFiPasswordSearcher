@@ -75,8 +75,8 @@ public class StartActivity extends Activity {
                     @Override
                     public void run() {
                         final AppVersion Version = new AppVersion(getApplicationContext());
-                        Boolean Result = Version.isActualyVersion();
-                        if(!Result)
+                        Boolean Result = Version.isActualyVersion(getApplicationContext(), false);
+                        if (!Result)
                         {
                             runOnUiThread(new Runnable() {
                                 @Override

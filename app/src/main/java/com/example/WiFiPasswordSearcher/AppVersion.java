@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.widget.Toast;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,14 +83,15 @@ public class AppVersion
                 JSONObject Json = new JSONObject(RawData);
                 Boolean Successes = Json.getBoolean("Successes");
                 LoadSuccesses = Successes;
-                if(LoadSuccesses)
+                if (LoadSuccesses)
                 {
                     ActualyVersion = (float)Json.getDouble("ActualyVersion");
                     WhatNews = Json.getString("WhatNews");
                     return;
                 }
 
-            } catch (JSONException e)
+            }
+            catch (JSONException e)
             {
                 e.printStackTrace();
             }
@@ -100,16 +103,34 @@ public class AppVersion
         }
     }
 
-    public Boolean isActualyVersion()
+    public Boolean isActualyVersion(Context context, Boolean showMessage)
     {
-        if(!LoadSuccesses) try {
+        if (showMessage) LoadSuccesses = false;
+
+        if (!LoadSuccesses) try {
             GetActualyVersion();
         } catch (IOException e) {
+            LoadSuccesses = false;
+        }
+        if (!LoadSuccesses)
+        {
+            if (showMessage)
+            {
+                Toast t = Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT);
+                t.show();
+            }
             return true;
         }
-        if(!LoadSuccesses) return true;
         Float CurVersion = Float.parseFloat(context.getResources().getString(R.string.app_version));
-        if(CurVersion >= ActualyVersion) return true;
+        if (CurVersion >= ActualyVersion)
+        {
+            if (showMessage)
+            {
+                Toast t = Toast.makeText(context, "Using latest version", Toast.LENGTH_SHORT);
+                t.show();
+            }
+            return true;
+        }
         return false;
     }
 }

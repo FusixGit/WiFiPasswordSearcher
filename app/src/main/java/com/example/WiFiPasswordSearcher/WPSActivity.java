@@ -16,8 +16,6 @@ import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
 import org.json.*;
 
-import static java.lang.Thread.sleep;
-
 
 class WPSPin
 {

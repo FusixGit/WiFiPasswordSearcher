@@ -46,7 +46,7 @@ public class SettingsActivity extends Activity {
                     break;
                 case 2: // Check updates
                     AppVersion Version = new AppVersion(getApplicationContext());
-                    if(!Version.isActualyVersion())
+                    if (!Version.isActualyVersion(getApplicationContext(), true))
                     {
                         Version.ShowUpdateDialog(SettingsActivity.this);
                     }
