@@ -501,53 +501,48 @@ public class MyActivity extends Activity {
                                 break;
                             }
 
-                            WifiConfiguration WifiCfg = new WifiConfiguration();
-                            WifiCfg.BSSID = scanResult.BSSID;
-                            WifiCfg.SSID = String.format("\"%s\"", scanResult.SSID);
-                            WifiCfg.hiddenSSID = false;
-                            WifiCfg.priority = 1000;
-
-                            if (scanResult.capabilities.indexOf("WEP") > -1)
+                            if (!WifiMgr.isWifiEnabled())
                             {
-                                WifiCfg.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                                WifiCfg.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-                                WifiCfg.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-                                WifiCfg.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
-                                WifiCfg.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
-                                WifiCfg.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-                                WifiCfg.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-                                WifiCfg.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-                                WifiCfg.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-
-                                WifiCfg.wepKeys[0] = String.format("\"%s\"", apdata.Keys.get(0));
-                                WifiCfg.wepTxKeyIndex = 0;
+                                Toast toast = Toast.makeText(getApplicationContext(),
+                                        "Wi-Fi interface is disabled", Toast.LENGTH_SHORT);
+                                toast.show();
+                                break;
+                            }
+                            List<WifiConfiguration> list = WifiMgr.getConfiguredNetworks();
+                            int cnt = 0;
+                            for (WifiConfiguration wifi : list)
+                            {
+                                if (wifi.SSID != null && wifi.SSID.equals("\"" + scanResult.SSID + "\""))
+                                    cnt++;
+                            }
+                            if (cnt > 0)
+                            {
+                                final ScanResult gScanResult = scanResult;
+                                final APData gAPData = apdata;
+                                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        switch (which)
+                                        {
+                                            case DialogInterface.BUTTON_POSITIVE:
+                                                addNetworkProfile(gScanResult, gAPData);
+                                                break;
+                                            case DialogInterface.BUTTON_NEGATIVE:
+                                                break;
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                };
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MyActivity.this);
+                                builder.setTitle(String.format("Network \"%s\" is already stored %d times.", scanResult.SSID, cnt))
+                                    .setMessage("Do you still want to add this network?")
+                                    .setPositiveButton("Yes", dialogClickListener)
+                                    .setNegativeButton("No", dialogClickListener).show();
                             }
                             else
-                            {
-                                WifiCfg.preSharedKey = String.format("\"%s\"", apdata.Keys.get(0));
-                            }
-
-                            int netId = WifiMgr.addNetwork(WifiCfg);
-                            Toast toast;
-                            if (netId > -1)
-                            {
-                                toast = Toast.makeText(getApplicationContext(),
-                                        "Network profile added!", Toast.LENGTH_SHORT);
-                            }
-                            else
-                            {
-                                if (WifiMgr.isWifiEnabled())
-                                {
-                                    toast = Toast.makeText(getApplicationContext(),
-                                            "Failed to add network profile", Toast.LENGTH_SHORT);
-                                }
-                                else
-                                {
-                                    toast = Toast.makeText(getApplicationContext(),
-                                            "Wi-Fi interface is disabled", Toast.LENGTH_SHORT);
-                                }
-                            }
-                            toast.show();
+                                addNetworkProfile(scanResult, apdata);
                             break;
                         case 5:         // wps
                             Intent wpsActivityIntent = new Intent(MyActivity.this, WPSActivity.class);
@@ -573,6 +568,57 @@ public class MyActivity extends Activity {
         }
 
     };
+
+    private void addNetworkProfile(ScanResult scanResult, APData apdata)
+    {
+        WifiConfiguration WifiCfg = new WifiConfiguration();
+        WifiCfg.BSSID = scanResult.BSSID;
+        WifiCfg.SSID = String.format("\"%s\"", scanResult.SSID);
+        WifiCfg.hiddenSSID = false;
+        WifiCfg.priority = 1000;
+
+        if (scanResult.capabilities.indexOf("WEP") > -1)
+        {
+            WifiCfg.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            WifiCfg.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            WifiCfg.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            WifiCfg.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+            WifiCfg.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
+            WifiCfg.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+            WifiCfg.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+            WifiCfg.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+            WifiCfg.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+
+            WifiCfg.wepKeys[0] = String.format("\"%s\"", apdata.Keys.get(0));
+            WifiCfg.wepTxKeyIndex = 0;
+        }
+        else
+        {
+            WifiCfg.preSharedKey = String.format("\"%s\"", apdata.Keys.get(0));
+        }
+
+        int netId = WifiMgr.addNetwork(WifiCfg);
+        Toast toast;
+        if (netId > -1)
+        {
+            toast = Toast.makeText(getApplicationContext(),
+                    "Network profile added!", Toast.LENGTH_SHORT);
+        }
+        else
+        {
+            if (WifiMgr.isWifiEnabled())
+            {
+                toast = Toast.makeText(getApplicationContext(),
+                        "Failed to add network profile", Toast.LENGTH_SHORT);
+            }
+            else
+            {
+                toast = Toast.makeText(getApplicationContext(),
+                        "Wi-Fi interface is disabled", Toast.LENGTH_SHORT);
+            }
+        }
+        toast.show();
+    }
 
     private View.OnClickListener vKEYOnClick = new View.OnClickListener()
     {
