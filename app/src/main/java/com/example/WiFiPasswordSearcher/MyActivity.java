@@ -45,11 +45,9 @@ class WiFiListSimpleAdapter extends SimpleAdapter
 {
     private Context context;
     private List DataList;
-    private Map<Integer, View> myViews = new HashMap<Integer, View>();
     private static HashMap<String, Drawable> SvgImageCache = new HashMap<String, Drawable>();
 
     private int choosePasswordId  = -1;
-    private View choosingPasswordView = null;
 
     public WiFiListSimpleAdapter(Context _context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
         super(_context, data, resource, from, to);
@@ -126,9 +124,9 @@ class WiFiListSimpleAdapter extends SimpleAdapter
         imgSec.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         imgWPS.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
-        SVG svgImg = null;
+        SVG svgImg;
 
-        if (Capability.indexOf("WPA2") > -1)
+        if (Capability.contains("WPA2"))
         {
             Drawable img = SvgImageCache.get("WPA2");
             if (img == null)
@@ -139,7 +137,7 @@ class WiFiListSimpleAdapter extends SimpleAdapter
             }
             imgSec.setImageDrawable(img);
         }
-        else if (Capability.indexOf("WPA") > -1)
+        else if (Capability.contains("WPA"))
         {
             Drawable img = SvgImageCache.get("WPA");
             if (img == null)
@@ -150,7 +148,7 @@ class WiFiListSimpleAdapter extends SimpleAdapter
             }
             imgSec.setImageDrawable(img);
         }
-        else if (Capability.indexOf("WEP") > -1)
+        else if (Capability.contains("WEP"))
         {
             Drawable img = SvgImageCache.get("WEP");
             if (img == null)
@@ -173,7 +171,7 @@ class WiFiListSimpleAdapter extends SimpleAdapter
             imgSec.setImageDrawable(img);
         }
 
-        if (Capability.indexOf("WPS") > -1)
+        if (Capability.contains("WPS"))
         {
             Drawable img = SvgImageCache.get("WPS");
             if (img == null)
@@ -231,7 +229,7 @@ class WiFiListSimpleAdapter extends SimpleAdapter
             for (int i = 0; i < keysList.length; i++)
             {
                 String WPS = wpss.get(i);
-                if (WPS == "") {
+                if (WPS.isEmpty()) {
                     keysList[i] = "Key: " + DeleteInTextTags(keys.get(i));
                 }
                 else {
@@ -273,7 +271,7 @@ class WiFiListSimpleAdapter extends SimpleAdapter
         txtKey.setText(KeyColor + choosedPassword);
         ParseInTextTags(txtKey);
         TextView txtWPS = (TextView)row.findViewById(R.id.txtWPS);
-        txtWPS.setText(curWPS == "" ? "*[color:gray]*[unknown]" : "*[color:blue]*" + curWPS);
+        txtWPS.setText(curWPS.isEmpty() ? "*[color:gray]*[unknown]" : "*[color:blue]*" + curWPS);
         ParseInTextTags(txtWPS);
     }
 }
@@ -305,7 +303,6 @@ public class MyActivity extends Activity {
     public static ArrayList<APData> WiFiKeys = new ArrayList<APData>();
 
     private static boolean ScanInProcess = false;
-    private static boolean WiFiListPrepared = false;
     private static BroadcastReceiver ScanWiFiReceiverIntent = null;
 
     private WifiManager WifiMgr = null;
@@ -413,11 +410,8 @@ public class MyActivity extends Activity {
 
             TextView txtBSSID = GetDataRowsFromLinLay(item, "BSSID");
             TextView txtESSID = GetDataRowsFromLinLay(item, "ESSID");
-            TextView txtKey = GetDataRowsFromLinLay(item, "KEY");
 
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MyActivity.this);
-
-            View dialogView = MyActivity.this.getLayoutInflater().inflate(R.layout.listclick_contextmenu, null);
 
             dialogBuilder.setTitle(txtESSID.getText());
             final String ESSDWps = txtESSID.getText().toString();
@@ -577,7 +571,7 @@ public class MyActivity extends Activity {
         WifiCfg.hiddenSSID = false;
         WifiCfg.priority = 1000;
 
-        if (scanResult.capabilities.indexOf("WEP") > -1)
+        if (scanResult.capabilities.contains("WEP"))
         {
             WifiCfg.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
             WifiCfg.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
@@ -620,16 +614,6 @@ public class MyActivity extends Activity {
         toast.show();
     }
 
-    private View.OnClickListener vKEYOnClick = new View.OnClickListener()
-    {
-        public void onClick(View v)
-        {
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    "Copy...", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    };
-
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
@@ -639,7 +623,6 @@ public class MyActivity extends Activity {
     public void onRestoreInstanceState(Bundle savedInstanceState)
     {
         super.onRestoreInstanceState(savedInstanceState);
-
     }
 
     public void ApiDataTest()
@@ -824,15 +807,15 @@ public class MyActivity extends Activity {
                     String error = json.getString("error");
                     final String errorDesc = User.GetErrorDesc(error);
 
-                    if (error.equals("loginfail"))
-                    {
-                        mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, false);
-                        mSettings.Editor.commit();
-                        API_KEYS_VALID = false;
-                        ApiDataTest();
-                        return;
-                    }
                     if (error != null) {
+                        if (error.equals("loginfail"))
+                        {
+                            mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, false);
+                            mSettings.Editor.commit();
+                            API_KEYS_VALID = false;
+                            ApiDataTest();
+                            return;
+                        }
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -900,7 +883,7 @@ public class MyActivity extends Activity {
                 ElemWiFi.put("KEYSCOUNT", "*[color:green]*" + Integer.toString(apdata.Keys.size()));
             }
 
-            if (apdata.WPS.size() < 1 || apdata.WPS.get(0) == "")
+            if (apdata.WPS.size() < 1 || apdata.WPS.get(0).length() == 0)
             {
                 ElemWiFi.put("WPS", "*[color:gray]*[unknown]");
             }
@@ -913,7 +896,6 @@ public class MyActivity extends Activity {
             ElemWiFi.put("CAPABILITY", result.capabilities);
             list.add(ElemWiFi);
 
-            ArrayList nodeKey = new ArrayList();
             WiFiKeys.add(i, apdata);
             i++;
         }
@@ -931,17 +913,6 @@ public class MyActivity extends Activity {
             }
         }
         ));
-    }
-
-    private String WiFiKeyDeleteServiceData(String Key)
-    {
-        if (Key.length() > 2 && Key.substring(0, 2).equals("*["))
-        {
-            String stylePref = Key.substring(2, Key.indexOf("]*"));
-            Key  = Key.substring(stylePref.length() + 4);
-        }
-        if (Key == "[request error]" || Key == "[unknown]") return null;
-        return Key;
     }
 
     public APData GetWiFiKeyByBSSID(JSONObject bss, String ESSID, String BSSID)
