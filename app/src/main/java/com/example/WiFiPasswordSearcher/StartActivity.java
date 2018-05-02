@@ -55,8 +55,6 @@ public class StartActivity extends Activity {
         btnUserInfo = (Button)findViewById(R.id.btnUserInfo);
 
         SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, "http://3wifi.stascorp.com");
-        String API_READ_KEY = mSettings.AppSettings.getString(Settings.API_READ_KEY, "");
-        String API_WRITE_KEY = mSettings.AppSettings.getString(Settings.API_WRITE_KEY, "");
         Boolean API_KEYS_VALID = mSettings.AppSettings.getBoolean(Settings.API_KEYS_VALID, false);
         String SavedLogin = mSettings.AppSettings.getString(Settings.APP_SERVER_LOGIN, "");
         String SavedPassword = mSettings.AppSettings.getString(Settings.APP_SERVER_PASSWORD, "");
@@ -146,7 +144,6 @@ public class StartActivity extends Activity {
                 Intent mainActivity = new Intent(StartActivity.this, MyActivity.class);
                 startActivity(mainActivity);
                 finish();
-                return;
             }
         });
     }
@@ -172,112 +169,114 @@ public class StartActivity extends Activity {
 
     private boolean getApiKeys(String Login, String Password) throws IOException
     {
-            String Args = "/api/apikeys";
-            BufferedReader Reader = null;
-            String ReadLine = "";
-            String RawData = "";
+        String Args = "/api/apikeys";
+        BufferedReader Reader;
+        String ReadLine;
+        String RawData = "";
 
-            try {
-                URL Uri = new URL(SERVER_URI + Args);
+        try {
+            URL Uri = new URL(SERVER_URI + Args);
 
-                HttpURLConnection Connection = (HttpURLConnection) Uri.openConnection();
-                Connection.setRequestMethod("POST");
-                Connection.setDoOutput(true);
-                Connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            HttpURLConnection Connection = (HttpURLConnection) Uri.openConnection();
+            Connection.setRequestMethod("POST");
+            Connection.setDoOutput(true);
+            Connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-                OutputStream os = Connection.getOutputStream();
-                DataOutputStream  writer = new DataOutputStream (
-                        Connection.getOutputStream());
-                writer.writeBytes(
-                    "login=" + URLEncoder.encode(Login, "UTF-8") +
-                    "&password=" + URLEncoder.encode(Password, "UTF-8") +
-                    "&genread=1");
+            DataOutputStream  writer = new DataOutputStream (
+                    Connection.getOutputStream());
+            writer.writeBytes(
+                "login=" + URLEncoder.encode(Login, "UTF-8") +
+                "&password=" + URLEncoder.encode(Password, "UTF-8") +
+                "&genread=1");
 
-                Connection.setReadTimeout(10 * 1000);
-                Connection.connect();
+            Connection.setReadTimeout(10 * 1000);
+            Connection.connect();
 
-                Reader = new BufferedReader(new InputStreamReader(Connection.getInputStream()));
+            Reader = new BufferedReader(new InputStreamReader(Connection.getInputStream()));
 
-                while ((ReadLine = Reader.readLine()) != null) {
-                    RawData += ReadLine;
-                }
-
-                try
-                {
-                    String ReadApiKey = null, WriteApiKey = null;
-                    JSONObject Json = new JSONObject(RawData);
-                    Boolean Successes = Json.getBoolean("result");
-                    if (Successes)
-                    {
-                        JSONObject profile = Json.getJSONObject("profile");
-
-                        JSONArray keys = Json.getJSONArray("data");
-                        for (int i = 0; i < keys.length(); i++)
-                        {
-                            JSONObject keyData = keys.getJSONObject(i);
-                            String access = keyData.getString("access");
-
-                            if (access.equals("read"))
-                            {
-                                ReadApiKey = keyData.getString("key");
-                            }
-                            else if (access.equals("write"))
-                            {
-                                WriteApiKey = keyData.getString("key");
-                            }
-                            if (ReadApiKey != null && WriteApiKey != null)
-                                break;
-                        }
-
-                        if (ReadApiKey == null)
-                        {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast t = Toast.makeText(getApplicationContext(), "No API keys received.", Toast.LENGTH_SHORT);
-                                    t.show();
-                                }
-                            });
-                            return false;
-                        }
-
-                        mSettings.Editor.putString(Settings.APP_SERVER_LOGIN, Login);
-                        mSettings.Editor.putString(Settings.APP_SERVER_PASSWORD, Password);
-                        mSettings.Editor.putString(Settings.API_READ_KEY, ReadApiKey);
-                        mSettings.Editor.putString(Settings.API_WRITE_KEY, WriteApiKey);
-                        mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, true);
-                        mSettings.Editor.putString(Settings.USER_NICK, profile.getString("nick"));
-                        mSettings.Editor.putString(Settings.USER_REGDATE, profile.getString("regdate"));
-                        mSettings.Editor.putInt(Settings.USER_GROUP, profile.getInt("level"));
-                        mSettings.Editor.commit();
-
-                        return true;
-                    }
-                    else
-                    {
-                        String error = Json.getString("error");
-                        final String errorDesc = User.GetErrorDesc(error);
-
-                        if (error != null) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast t = Toast.makeText(getApplicationContext(), errorDesc, Toast.LENGTH_SHORT);
-                                    t.show();
-                                }
-                            });
-                        }
-                    }
-                } catch (JSONException e)
-                {
-                    e.printStackTrace();
-                }
-            }finally
-            {
-
+            while ((ReadLine = Reader.readLine()) != null) {
+                RawData += ReadLine;
             }
+
+            try
+            {
+                String ReadApiKey = null, WriteApiKey = null;
+                JSONObject Json = new JSONObject(RawData);
+                Boolean Successes = Json.getBoolean("result");
+                if (Successes)
+                {
+                    JSONObject profile = Json.getJSONObject("profile");
+
+                    JSONArray keys = Json.getJSONArray("data");
+                    for (int i = 0; i < keys.length(); i++)
+                    {
+                        JSONObject keyData = keys.getJSONObject(i);
+                        String access = keyData.getString("access");
+
+                        if (access.equals("read"))
+                        {
+                            ReadApiKey = keyData.getString("key");
+                        }
+                        else if (access.equals("write"))
+                        {
+                            WriteApiKey = keyData.getString("key");
+                        }
+                        if (ReadApiKey != null && WriteApiKey != null)
+                            break;
+                    }
+
+                    if (ReadApiKey == null)
+                    {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast t = Toast.makeText(getApplicationContext(), "No API keys received.", Toast.LENGTH_SHORT);
+                                t.show();
+                            }
+                        });
+                        return false;
+                    }
+
+                    mSettings.Editor.putString(Settings.APP_SERVER_LOGIN, Login);
+                    mSettings.Editor.putString(Settings.APP_SERVER_PASSWORD, Password);
+                    mSettings.Editor.putString(Settings.API_READ_KEY, ReadApiKey);
+                    mSettings.Editor.putString(Settings.API_WRITE_KEY, WriteApiKey);
+                    mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, true);
+                    mSettings.Editor.putString(Settings.USER_NICK, profile.getString("nick"));
+                    mSettings.Editor.putString(Settings.USER_REGDATE, profile.getString("regdate"));
+                    mSettings.Editor.putInt(Settings.USER_GROUP, profile.getInt("level"));
+                    mSettings.Editor.commit();
+
+                    return true;
+                }
+                else
+                {
+                    String error = Json.getString("error");
+                    final String errorDesc = User.GetErrorDesc(error);
+
+                    if (error != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast t = Toast.makeText(getApplicationContext(), errorDesc, Toast.LENGTH_SHORT);
+                                t.show();
+                            }
+                        });
+                    }
+                }
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        finally
+        {
+
+        }
         return false;
     }
+
     public void btnOffline(View view)
     {
         Intent offlineActivityIntent = new Intent(StartActivity.this, MyActivity.class);
