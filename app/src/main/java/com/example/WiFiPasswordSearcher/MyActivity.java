@@ -1,4 +1,3 @@
-
 package com.example.WiFiPasswordSearcher;
 
 import android.app.Activity;
@@ -529,12 +528,26 @@ public class MyActivity extends Activity {
                             }
 
                             int netId = WifiMgr.addNetwork(WifiCfg);
+                            Toast toast;
                             if (netId > -1)
                             {
-                                Toast toast = Toast.makeText(getApplicationContext(),
-                                        "Network added!", Toast.LENGTH_SHORT);
-                                toast.show();
+                                toast = Toast.makeText(getApplicationContext(),
+                                        "Network profile added!", Toast.LENGTH_SHORT);
                             }
+                            else
+                            {
+                                if (WifiMgr.isWifiEnabled())
+                                {
+                                    toast = Toast.makeText(getApplicationContext(),
+                                            "Failed to add network profile", Toast.LENGTH_SHORT);
+                                }
+                                else
+                                {
+                                    toast = Toast.makeText(getApplicationContext(),
+                                            "Wi-Fi interface is disabled", Toast.LENGTH_SHORT);
+                                }
+                            }
+                            toast.show();
                             break;
                         case 5:         // wps
                             Intent wpsActivityIntent = new Intent(MyActivity.this, WPSActivity.class);
@@ -656,6 +669,13 @@ public class MyActivity extends Activity {
     {
         WiFiScanResult = null;
         adapter = null;
+        if (!WifiMgr.isWifiEnabled())
+        {
+            Toast toast = Toast.makeText(this,
+                    "Wi-Fi interface is disabled", Toast.LENGTH_SHORT);
+            toast.show();
+            return;
+        }
         final ProgressDialog dProccess = new ProgressDialog(MyActivity.this);
         dProccess.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dProccess.setMessage("Scanning networks...");
