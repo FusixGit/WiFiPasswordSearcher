@@ -47,8 +47,6 @@ class WiFiListSimpleAdapter extends SimpleAdapter
     private List DataList;
     private static HashMap<String, Drawable> SvgImageCache = new HashMap<String, Drawable>();
 
-    private int choosePasswordId  = -1;
-
     public WiFiListSimpleAdapter(Context _context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
         super(_context, data, resource, from, to);
         context = _context;
@@ -243,13 +241,26 @@ class WiFiListSimpleAdapter extends SimpleAdapter
                 public void onClick(DialogInterface dialog, int item) {
                     passwordChoose(rowId, item);
                 }});
-            choosePasswordId = rowId;
             dialogBuilder.show();
         }
     };
 
     private void passwordChoose(int rowID, int passId)
     {
+        View row = null;
+        for (int i = 0; i < MyActivity.WiFiList.getChildCount(); i++)
+        {
+            row = MyActivity.WiFiList.getChildAt(i);
+            TextView txtRowId = (TextView)row.findViewById(R.id.txtRowId);
+            int rid = Integer.parseInt(txtRowId.getText().toString());
+            if (rid != rowID)
+                row = null;
+            else
+                break;
+        }
+        if (row == null)
+            return;
+
         ArrayList<String> keys = MyActivity.WiFiKeys.get(rowID).Keys;
         ArrayList<Boolean> gen = MyActivity.WiFiKeys.get(rowID).Generated;
         ArrayList<String> wps = MyActivity.WiFiKeys.get(rowID).WPS;
@@ -265,7 +276,6 @@ class WiFiListSimpleAdapter extends SimpleAdapter
         wps.set(passId, wps.get(0));
         wps.set(0, curWPS);
 
-        View row = MyActivity.WiFiList.getChildAt(rowID);
         TextView txtKey = (TextView)row.findViewById(R.id.KEY);
         KeyColor = (isGen ? "*[color:red]*" : "*[color:green]*");
         txtKey.setText(KeyColor + choosedPassword);
