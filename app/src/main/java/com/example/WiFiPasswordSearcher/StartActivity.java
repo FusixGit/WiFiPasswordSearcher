@@ -1,7 +1,9 @@
 package com.example.WiFiPasswordSearcher;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -123,7 +125,8 @@ public class StartActivity extends Activity {
                                     llMenu.setVisibility(View.VISIBLE);
                                     edtLogin.setEnabled(false);
                                     edtPassword.setEnabled(false);
-                                }});
+                                }
+                            });
                         }
                         dProccess.dismiss();
                     }
@@ -263,6 +266,7 @@ public class StartActivity extends Activity {
                             }
                         });
                     }
+                    return false;
                 }
             }
             catch (JSONException e)
@@ -270,10 +274,38 @@ public class StartActivity extends Activity {
                 e.printStackTrace();
             }
         }
-        finally
+        catch (Exception e)
         {
-
+            e.printStackTrace();
         }
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        switch (which)
+                        {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                btnOffline(null);
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                        dialog.dismiss();
+                    }
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(StartActivity.this);
+                builder.setTitle("No internet connection")
+                    .setMessage("Do you want to work in offline mode?")
+                    .setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+            }
+        });
         return false;
     }
 
