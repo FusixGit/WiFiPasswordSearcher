@@ -311,6 +311,8 @@ public class StartActivity extends Activity {
 
     public void btnOffline(View view)
     {
+        mSettings.Editor.putString(Settings.API_READ_KEY, "offline");
+        mSettings.Editor.commit();
         Intent offlineActivityIntent = new Intent(StartActivity.this, MyActivity.class);
         startActivity(offlineActivityIntent);
     }
