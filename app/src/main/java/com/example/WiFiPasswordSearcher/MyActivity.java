@@ -590,14 +590,13 @@ public class MyActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast t = Toast.makeText(getApplicationContext(), "Enter your credentials", Toast.LENGTH_SHORT);
+                    Toast t = Toast.makeText(getApplicationContext(), "Please enter credentials", Toast.LENGTH_SHORT);
                     t.show();
                 }
             });
             Intent startActivity = new Intent(this, StartActivity.class);
             startActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(startActivity);
-            return;
         }
     }
 

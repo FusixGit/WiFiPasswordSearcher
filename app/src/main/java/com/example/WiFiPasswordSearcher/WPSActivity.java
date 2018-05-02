@@ -140,7 +140,7 @@ public class WPSActivity extends Activity
         {
             // get MAC manufacturer
             String BSSID = BSSDWps[0];
-            String response2 = "";
+            String response2;
             DefaultHttpClient hc2 = new DefaultHttpClient();
             ResponseHandler<String> res2 = new BasicResponseHandler();
 
@@ -233,21 +233,47 @@ public class WPSActivity extends Activity
                 try
                 {
                     JSONObject jObject = new JSONObject(response);
-                    jObject = jObject.getJSONObject("data");
-                    jObject = jObject.getJSONObject(BSSID);
+                    Boolean result = jObject.getBoolean("result");
 
-                    JSONArray array =jObject.optJSONArray("scores");
-                    for (int i = 0; i < array.length(); i++)
+                    if (result)
                     {
-                        jObject = array.getJSONObject(i);
-                        wpsPin.add(jObject.getString("value"));
-                        wpsMet.add(jObject.getString("name"));
-                        wpsScore.add(jObject.getString("score"));
-                        wpsDb.add(jObject.getBoolean("fromdb") ? "✔" : "");
-                        Integer score = Math.round(Float.parseFloat(wpsScore.get(i)) * 100);
-                        wpsScore.set(i, Integer.toString(score) + "%");
+                        jObject = jObject.getJSONObject("data");
+                        jObject = jObject.getJSONObject(BSSID);
 
-                        data.add(new ItemWps(wpsPin.get(i), wpsMet.get(i), wpsScore.get(i), wpsDb.get(i)));
+                        JSONArray array =jObject.optJSONArray("scores");
+                        for (int i = 0; i < array.length(); i++)
+                        {
+                            jObject = array.getJSONObject(i);
+                            wpsPin.add(jObject.getString("value"));
+                            wpsMet.add(jObject.getString("name"));
+                            wpsScore.add(jObject.getString("score"));
+                            wpsDb.add(jObject.getBoolean("fromdb") ? "✔" : "");
+                            Integer score = Math.round(Float.parseFloat(wpsScore.get(i)) * 100);
+                            wpsScore.set(i, Integer.toString(score) + "%");
+
+                            data.add(new ItemWps(wpsPin.get(i), wpsMet.get(i), wpsScore.get(i), wpsDb.get(i)));
+                        }
+                    }
+                    else
+                    {
+                        String error = jObject.getString("error");
+
+                        if (error.equals("loginfail"))
+                        {
+                            mSettings.Editor.putBoolean(Settings.API_KEYS_VALID, false);
+                            mSettings.Editor.commit();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast t = Toast.makeText(getApplicationContext(), "Please enter credentials", Toast.LENGTH_SHORT);
+                                    t.show();
+                                }
+                            });
+                            Intent startActivity = new Intent(getApplicationContext(), StartActivity.class);
+                            startActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(startActivity);
+                        }
+                        response = "api_error";
                     }
                 }
                 catch (JSONException e)
@@ -275,6 +301,11 @@ public class WPSActivity extends Activity
                 toast = false;
             }
             else if (str.equals("json_error"))
+            {
+                msg = "Connection failure";
+                toast = false;
+            }
+            else if (str.equals("api_error"))
             {
                 msg = "Database failure";
                 toast = false;
