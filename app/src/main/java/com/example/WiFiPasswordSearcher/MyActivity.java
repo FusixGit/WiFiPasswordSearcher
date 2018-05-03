@@ -41,6 +41,15 @@ class APData
     public ArrayList<String> WPS;
 }
 
+class MyScanResult
+{
+    public String BSSID;
+    public String SSID;
+    public int frequency;
+    public int level;
+    public String capabilities;
+}
+
 class WiFiListSimpleAdapter extends SimpleAdapter
 {
     private Context context;
@@ -308,7 +317,7 @@ public class MyActivity extends Activity {
     private Button btnCheckFromBase = null;
     private Button btnStartGPSLog = null;
     private ImageButton btnSettings = null;
-    private static List<ScanResult> WiFiScanResult = null;
+    private static List<MyScanResult> WiFiScanResult = null;
     public static ArrayList<APData> WiFiKeys = new ArrayList<APData>();
 
     private static boolean ScanInProcess = false;
@@ -432,7 +441,7 @@ public class MyActivity extends Activity {
                     APData apdata;
                     Boolean NeedToast = false;
 
-                    ScanResult scanResult = WiFiScanResult.get((int)id);
+                    MyScanResult scanResult = WiFiScanResult.get((int)id);
 
                     switch (item)
                     {
@@ -520,7 +529,7 @@ public class MyActivity extends Activity {
                             }
                             if (cnt > 0)
                             {
-                                final ScanResult gScanResult = scanResult;
+                                final MyScanResult gScanResult = scanResult;
                                 final APData gAPData = apdata;
                                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
                                 {
@@ -572,7 +581,7 @@ public class MyActivity extends Activity {
 
     };
 
-    private void addNetworkProfile(ScanResult scanResult, APData apdata)
+    private void addNetworkProfile(MyScanResult scanResult, APData apdata)
     {
         WifiConfiguration WifiCfg = new WifiConfiguration();
         WifiCfg.BSSID = scanResult.BSSID;
@@ -707,6 +716,65 @@ public class MyActivity extends Activity {
     {
         WiFiScanResult = null;
         adapter = null;
+        if (false)
+        {
+            try
+            {
+                List<MyScanResult> results = new ArrayList<MyScanResult>();
+                MyScanResult sc;
+                sc = new MyScanResult();
+                sc.BSSID = "00:0E:8F:D3:5E:9C";
+                sc.SSID = "beeline 49";
+                sc.capabilities = "WPA WPA2 WPS";
+                sc.level = -58;
+                sc.frequency = 2440;
+                results.add(sc);
+
+                sc = new MyScanResult();
+                sc.BSSID = "64:D9:54:39:15:6B";
+                sc.SSID = "MGTS_ADSL_7003";
+                sc.capabilities = "WPA2 WPS";
+                sc.level = -65;
+                sc.frequency = 2460;
+                results.add(sc);
+
+                sc = new MyScanResult();
+                sc.BSSID = "2C:AB:25:06:49:CB";
+                sc.SSID = "beeline-50";
+                sc.capabilities = "WPA WPS";
+                sc.level = -70;
+                sc.frequency = 2420;
+                results.add(sc);
+
+                ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+                HashMap<String, String> ElemWiFi;
+                WiFiScanResult = results;
+
+                for (MyScanResult result : results) {
+                    ElemWiFi = new HashMap<String, String>();
+                    ElemWiFi.put("ESSID", result.SSID);
+                    ElemWiFi.put("BSSID", result.BSSID.toUpperCase());
+                    ElemWiFi.put("KEY", "*[color:gray]*[no data]");
+                    ElemWiFi.put("WPS", "*[color:gray]*[no data]");
+                    ElemWiFi.put("SIGNAL", getStrSignal(result.level));
+                    ElemWiFi.put("KEYSCOUNT", "*[color:gray]*0");
+                    ElemWiFi.put("CAPABILITY", result.capabilities);
+
+                    list.add(ElemWiFi);
+                }
+
+                adapter = new WiFiListSimpleAdapter(getActivity(), list, R.layout.row,
+                        new String[]{"ESSID", "BSSID", "KEY", "WPS", "SIGNAL", "KEYSCOUNT", "CAPABILITY"},
+                        new int[]{R.id.ESSID, R.id.BSSID, R.id.KEY, R.id.txtWPS, R.id.txtSignal, R.id.txtKeysCount});
+                WiFiList.setAdapter(adapter);
+
+                ScanInProcess = false;
+                btnRefresh.setEnabled(true);
+                btnCheckFromBase.setEnabled(true);
+            }
+            catch (Exception e) {}
+            return;
+        }
         if (!WifiMgr.isWifiEnabled())
         {
             Toast toast = Toast.makeText(this,
@@ -724,13 +792,23 @@ public class MyActivity extends Activity {
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                List<ScanResult> results = WifiMgr.getScanResults();
+                List<ScanResult> res = WifiMgr.getScanResults();
+                List<MyScanResult> results = new ArrayList<MyScanResult>();
+                for (ScanResult result : res) {
+                    MyScanResult sc = new MyScanResult();
+                    sc.BSSID = result.BSSID;
+                    sc.SSID = result.SSID;
+                    sc.level = result.level;
+                    sc.frequency = result.frequency;
+                    sc.capabilities = result.capabilities;
+                    results.add(sc);
+                }
                 WiFiScanResult = results;
 
                 ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
                 HashMap<String, String> ElemWiFi;
 
-                for (ScanResult result : results) {
+                for (MyScanResult result : results) {
                     ElemWiFi = new HashMap<String, String>();
                     ElemWiFi.put("ESSID", result.SSID);
                     ElemWiFi.put("BSSID", result.BSSID.toUpperCase());
@@ -780,7 +858,7 @@ public class MyActivity extends Activity {
             JSONObject query = new JSONObject();
             query.put("key", API_READ_KEY);
             JSONArray bssids = new JSONArray();
-            for (ScanResult result : WiFiScanResult) {
+            for (MyScanResult result : WiFiScanResult) {
                 bssids.put(result.BSSID);
             }
             query.put("bssid", bssids);
@@ -881,7 +959,7 @@ public class MyActivity extends Activity {
         HashMap<String, String> ElemWiFi;
         String KeyColor;
         int i = 0;
-        for (ScanResult result : WiFiScanResult) {
+        for (MyScanResult result : WiFiScanResult) {
             APData apdata = GetWiFiKeyByBSSID(bss, result.SSID, result.BSSID.toUpperCase());
 
             ElemWiFi = new HashMap<String, String>();
