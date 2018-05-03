@@ -10,6 +10,7 @@ import android.view.*;
 import android.webkit.*;
 import android.widget.*;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
@@ -122,7 +123,56 @@ public class WPSActivity extends Activity
             }
         });
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.loadUrl("file:///android_asset/wpspin.html");
+        OutputStream out = null;
+        String wpsfile;
+        String filename = "wpspin.html";
+        try
+        {
+            String outDir = getFilesDir().getAbsolutePath() + "/";
+
+            DefaultHttpClient hc = new DefaultHttpClient();
+            ResponseHandler<String> res = new BasicResponseHandler();
+
+            HttpGet http = new HttpGet(SERVER_URI + "/wpspin");
+            String str = "";
+            Boolean exists = false;
+            try
+            {
+                str = hc.execute(http, res);
+            }
+            catch (Exception e)
+            {
+                File file = getApplicationContext().getFileStreamPath(outDir + filename);
+                exists = file != null && file.exists();
+                if (!exists)
+                {
+                    InputStream in = getAssets().open(filename);
+                    int size = in.available();
+                    byte[] data = new byte[size];
+                    in.read(data);
+                    in.close();
+                    str = new String(data, "UTF-8");
+                }
+            }
+            if (!exists)
+            {
+                File outFile = new File(outDir, filename);
+                out = new FileOutputStream(outFile);
+                wpsfile = "file://" + outFile.getAbsolutePath();
+
+                str = str.replace("a.filter((n) => b.includes(n));", "a;");
+                byte[] data = str.getBytes(Charset.forName("UTF-8"));
+                out.write(data);
+                out.close();
+            }
+            else
+                wpsfile = "file://" + outDir + filename;
+        }
+        catch (Exception e)
+        {
+            wpsfile = "file:///android_asset/wpspin.html";
+        }
+        mWebView.loadUrl(wpsfile);
 
         new AsyncInitActivity().execute(BSSDWps);
     }
