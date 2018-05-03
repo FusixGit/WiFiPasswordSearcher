@@ -155,11 +155,13 @@ public class WPSActivity extends Activity
                 response2 = "N/A";
             }
 
-            while (!wpsReady)
+            int wait = 8000;
+            while (!wpsReady && wait > 0)
             {
                 try
                 {
                     Thread.sleep(100);
+                    wait -= 100;
                 }
                 catch (Exception e) {}
             }
