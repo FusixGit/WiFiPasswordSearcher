@@ -286,7 +286,6 @@ class WiFiListSimpleAdapter extends SimpleAdapter
     }
 }
 
-
 public class MyActivity extends Activity {
     /**
      * Called when the activity is first created.
@@ -839,7 +838,15 @@ public class MyActivity extends Activity {
                 }
                 if (!json.isNull("data"))
                 {
-                    bss = json.getJSONObject("data");
+                    try
+                    {
+                        bss = json.getJSONObject("data");
+                    }
+                    catch (Exception e)
+                    {
+                        // add empty object
+                        bss = new JSONObject();
+                    }
                 }
             }
             catch (Exception e)

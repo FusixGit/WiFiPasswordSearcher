@@ -237,22 +237,26 @@ public class WPSActivity extends Activity
 
                     if (result)
                     {
-                        jObject = jObject.getJSONObject("data");
-                        jObject = jObject.getJSONObject(BSSID);
-
-                        JSONArray array =jObject.optJSONArray("scores");
-                        for (int i = 0; i < array.length(); i++)
+                        try
                         {
-                            jObject = array.getJSONObject(i);
-                            wpsPin.add(jObject.getString("value"));
-                            wpsMet.add(jObject.getString("name"));
-                            wpsScore.add(jObject.getString("score"));
-                            wpsDb.add(jObject.getBoolean("fromdb") ? "✔" : "");
-                            Integer score = Math.round(Float.parseFloat(wpsScore.get(i)) * 100);
-                            wpsScore.set(i, Integer.toString(score) + "%");
+                            jObject = jObject.getJSONObject("data");
+                            jObject = jObject.getJSONObject(BSSID);
 
-                            data.add(new ItemWps(wpsPin.get(i), wpsMet.get(i), wpsScore.get(i), wpsDb.get(i)));
+                            JSONArray array = jObject.optJSONArray("scores");
+                            for (int i = 0; i < array.length(); i++)
+                            {
+                                jObject = array.getJSONObject(i);
+                                wpsPin.add(jObject.getString("value"));
+                                wpsMet.add(jObject.getString("name"));
+                                wpsScore.add(jObject.getString("score"));
+                                wpsDb.add(jObject.getBoolean("fromdb") ? "✔" : "");
+                                Integer score = Math.round(Float.parseFloat(wpsScore.get(i)) * 100);
+                                wpsScore.set(i, Integer.toString(score) + "%");
+
+                                data.add(new ItemWps(wpsPin.get(i), wpsMet.get(i), wpsScore.get(i), wpsDb.get(i)));
+                            }
                         }
+                        catch (Exception e) {}
                     }
                     else
                     {
