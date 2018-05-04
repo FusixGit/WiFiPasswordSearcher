@@ -548,8 +548,8 @@ public class MyActivity extends Activity {
                                     }
                                 };
                                 AlertDialog.Builder builder = new AlertDialog.Builder(MyActivity.this);
-                                builder.setTitle(String.format("Network \"%s\" is already stored %d times.", scanResult.SSID, cnt))
-                                    .setMessage("Do you still want to add this network?")
+                                builder.setTitle("Are you sure?")
+                                    .setMessage(String.format("Network \"%s\" is already stored %d times.", scanResult.SSID, cnt))
                                     .setPositiveButton("Yes", dialogClickListener)
                                     .setNegativeButton("No", dialogClickListener).show();
                             }
@@ -557,10 +557,32 @@ public class MyActivity extends Activity {
                                 addNetworkProfile(scanResult, apdata);
                             break;
                         case 5:         // wps
-                            Intent wpsActivityIntent = new Intent(MyActivity.this, WPSActivity.class);
-                            wpsActivityIntent.putExtra("variable", ESSDWps);
-                            wpsActivityIntent.putExtra("variable1", BSSDWps);
-                            startActivity(wpsActivityIntent);
+                            if (!scanResult.capabilities.contains("WPS"))
+                            {
+                                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        switch (which)
+                                        {
+                                            case DialogInterface.BUTTON_POSITIVE:
+                                                wpsGenStart(ESSDWps, BSSDWps);
+                                                break;
+                                            case DialogInterface.BUTTON_NEGATIVE:
+                                                break;
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                };
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MyActivity.this);
+                                builder.setTitle("Are you sure?")
+                                    .setMessage(String.format("Network \"%s\" is not WPS enabled.", scanResult.SSID))
+                                    .setPositiveButton("Yes", dialogClickListener)
+                                    .setNegativeButton("No", dialogClickListener).show();
+                                break;
+                            }
+                            wpsGenStart(ESSDWps, BSSDWps);
                             break;
                     }
 
@@ -580,6 +602,14 @@ public class MyActivity extends Activity {
         }
 
     };
+
+    private void wpsGenStart(String ESSDWps, String BSSDWps)
+    {
+        Intent wpsActivityIntent = new Intent(MyActivity.this, WPSActivity.class);
+        wpsActivityIntent.putExtra("variable", ESSDWps);
+        wpsActivityIntent.putExtra("variable1", BSSDWps);
+        startActivity(wpsActivityIntent);
+    }
 
     private void addNetworkProfile(MyScanResult scanResult, APData apdata)
     {
