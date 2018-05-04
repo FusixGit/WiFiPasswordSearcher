@@ -2,7 +2,15 @@ package com.example.WiFiPasswordSearcher;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,32 +25,110 @@ public class UserInfoActivity extends Activity {
     public TextView txtLogin = null;
     public TextView txtRegDate = null;
     public TextView txtGroup = null;
+    private String info;
+    public static String SERVER_URI = "";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user);
 
-        UserManager User = new UserManager(getApplicationContext());
-        User.getFromSettings();
+        Settings mSettings = new Settings(getApplicationContext());
+        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, "http://3wifi.stascorp.com");
+
+        try {
+            info = getIntent().getExtras().getString("showInfo");
+        }
+        catch (Exception e) {
+            info = "user";
+        }
 
         txtLogin = (TextView) findViewById(R.id.txtLogin);
         txtRegDate = (TextView) findViewById(R.id.txtRegDate);
         txtGroup = (TextView) findViewById(R.id.txtGroup);
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        String Nick, Group;
         Date date;
-        try {
-            date = format.parse(User.RegDate);
-        } catch (Exception e) {
-            date = new Date();
+
+        if (info != null && info.equals("wpspin"))
+        {
+            AppVersion updater = new AppVersion(getApplicationContext());
+            updater.wpsCompanionInit(false);
+
+            LinearLayout lButtons = (LinearLayout) findViewById(R.id.buttonsLayout);
+            lButtons.setVisibility(LinearLayout.VISIBLE);
+            Button btnRevert = (Button) findViewById(R.id.btnRevert);
+            btnRevert.setEnabled(!updater.wpsCompanionInternal());
+
+            TextView lReg = (TextView) findViewById(R.id.labRegDate);
+            TextView lGroup = (TextView) findViewById(R.id.labGroup);
+
+            Nick = "WPS PIN Companion";
+            lReg.setText("Last Updated");
+            date = updater.wpsCompanionGetDate();
+            lGroup.setText("File Size");
+            long size = updater.wpsCompanionGetSize();
+            Group = updater.readableFileSize(size);
+        }
+        else
+        {
+            UserManager User = new UserManager(getApplicationContext());
+            User.getFromSettings();
+
+            LinearLayout lButtons = (LinearLayout) findViewById(R.id.buttonsLayout);
+            lButtons.setVisibility(LinearLayout.GONE);
+
+            SimpleDateFormat format = new SimpleDateFormat(getResources().getString(R.string.DEFAULT_DATE_FORMAT), Locale.US);
+            try {
+                date = format.parse(User.RegDate);
+            } catch (Exception e) {
+                date = new Date();
+            }
+
+            Nick = User.NickName;
+            Group = User.GetGroup();
         }
 
-        String Nick = User.NickName;
-        String RegDate = DateFormat.getDateTimeInstance().format(date);
-        String Group = User.GetGroup();
-
         txtLogin.setText(Nick);
-        txtRegDate.setText(RegDate);
+        txtRegDate.setText(DateFormat.getDateTimeInstance().format(date));
         txtGroup.setText(Group);
+    }
+
+    public void btnUpdateOnClick(View v)
+    {
+        if (info != null && info.equals("wpspin"))
+        {
+            DefaultHttpClient hc = new DefaultHttpClient();
+            ResponseHandler<String> res = new BasicResponseHandler();
+
+            HttpGet http = new HttpGet(SERVER_URI + "/wpspin");
+            String str = "";
+            try
+            {
+                str = hc.execute(http, res);
+            }
+            catch (Exception e) {}
+
+            if (str.contains("initAlgos();"))
+            {
+                AppVersion updater = new AppVersion(getApplicationContext());
+                updater.wpsCompanionUpdate(str, new Date());
+                txtRegDate.setText(DateFormat.getDateTimeInstance().format(updater.wpsCompanionGetDate()));
+                txtGroup.setText(updater.readableFileSize(updater.wpsCompanionGetSize()));
+                Button btnRevert = (Button) findViewById(R.id.btnRevert);
+                btnRevert.setEnabled(!updater.wpsCompanionInternal());
+            }
+        }
+    }
+
+    public void btnRevertOnClick(View v)
+    {
+        if (info != null && info.equals("wpspin"))
+        {
+            AppVersion updater = new AppVersion(getApplicationContext());
+            updater.wpsCompanionInit(true);
+            txtRegDate.setText(DateFormat.getDateTimeInstance().format(updater.wpsCompanionGetDate()));
+            txtGroup.setText(updater.readableFileSize(updater.wpsCompanionGetSize()));
+            v.setEnabled(!updater.wpsCompanionInternal());
+        }
     }
 }

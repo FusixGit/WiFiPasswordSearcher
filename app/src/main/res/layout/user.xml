@@ -19,6 +19,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="4dp"
+		android:id="@+id/labRegDate"
 		android:textColor="#A0A0A0"
 		android:textSize="14dp"
 		android:text="Registration Date"/>
@@ -37,6 +38,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="4dp"
+		android:id="@+id/labGroup"
 		android:textColor="#A0A0A0"
 		android:textSize="14dp"
 		android:text="Access Level"/>
@@ -50,6 +52,29 @@
 		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:text="Level"
 		android:id="@+id/txtGroup"/>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="8dp"
+		android:id="@+id/buttonsLayout">
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Update"
+			android:onClick="btnUpdateOnClick"
+			android:focusable="true"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Revert"
+			android:onClick="btnRevertOnClick"
+			android:id="@+id/btnRevert"/>
+
+	</LinearLayout>
 
 </LinearLayout>
 

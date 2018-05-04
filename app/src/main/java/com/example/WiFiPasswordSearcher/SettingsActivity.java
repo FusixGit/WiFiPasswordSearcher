@@ -40,18 +40,23 @@ public class SettingsActivity extends Activity {
                     Intent ServerSettingsIntent = new Intent(SettingsActivity.this, ServerSettingsActivity.class);
                     startActivity(ServerSettingsIntent);
                     break;
-                case 1: // About
+                case 1: // Manage WPS PIN Companion
+                    Intent userActivity = new Intent(SettingsActivity.this, UserInfoActivity.class);
+                    userActivity.putExtra("showInfo", "wpspin");
+                    startActivity(userActivity);
+                    break;
+                case 2: // About
                     Intent AboutInfoIntent = new Intent(SettingsActivity.this, AboutActivity.class);
                     startActivity(AboutInfoIntent);
                     break;
-                case 2: // Check updates
+                case 3: // Check updates
                     AppVersion Version = new AppVersion(getApplicationContext());
                     if (!Version.isActualyVersion(getApplicationContext(), true))
                     {
                         Version.ShowUpdateDialog(SettingsActivity.this);
                     }
                     break;
-                case 3: // Logout
+                case 4: // Logout
                     Settings mSettings = new Settings(getApplicationContext());
                     mSettings.Reload();
                     mSettings.Editor.remove(Settings.APP_SERVER_LOGIN);

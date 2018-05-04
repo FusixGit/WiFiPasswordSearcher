@@ -137,7 +137,8 @@ public class StartActivity extends Activity {
         btnUserInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 Intent userActivity = new Intent(StartActivity.this, UserInfoActivity.class);
+                Intent userActivity = new Intent(StartActivity.this, UserInfoActivity.class);
+                userActivity.putExtra("showInfo", "user");
                 startActivity(userActivity);
             }
         });

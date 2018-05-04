@@ -3,11 +3,13 @@
     <string name="app_name">3WiFi Locator</string>
     <string name="app_version">0.6</string>
     <string name="SERVER_URI_DEFAULT">http://3wifi.stascorp.com</string>
+    <string name="DEFAULT_DATE_FORMAT">yyyy-MM-dd HH:mm:ss</string>
 
     <string name="app_about">3WiFi Locator.\n1.The program is distributed "AS IS".\n2.The developers are not liable for acts committed with the help of the program.</string>
 
     <string-array name="strings_settings_rows">
         <item>Locator Settings</item>
+        <item>WPS PIN Companion</item>
         <item>About</item>
         <item>Check updates</item>
         <item>Logout</item>

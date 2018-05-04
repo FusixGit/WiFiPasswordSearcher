@@ -12,10 +12,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class AppVersion
 {
@@ -24,6 +33,7 @@ public class AppVersion
     private Float ActualyVersion;
     private String WhatNews;
     private Boolean LoadSuccesses = false;
+    private String wpsInternalDate = "2018-04-29 23:30:29";
 
     public AppVersion(Context _context)
     {
@@ -132,5 +142,96 @@ public class AppVersion
             return true;
         }
         return false;
+    }
+
+    private Boolean wpsCompanionExists()
+    {
+        File file = new File(context.getFilesDir().getAbsolutePath() + "/wpspin.html");
+        return file.exists();
+    }
+
+    public void wpsCompanionInit(Boolean force)
+    {
+        if (wpsCompanionExists() && !force)
+            return;
+
+        String filename = "wpspin.html";
+        try
+        {
+            InputStream in = context.getAssets().open(filename);
+            int size = in.available();
+            byte[] data = new byte[size];
+            in.read(data);
+            in.close();
+            String str = new String(data, "UTF-8");
+
+            Date date;
+            SimpleDateFormat format = new SimpleDateFormat(context.getResources().getString(R.string.DEFAULT_DATE_FORMAT), Locale.US);
+            try {
+                date = format.parse(wpsInternalDate);
+            } catch (Exception e) {
+                date = new Date();
+            }
+            wpsCompanionUpdate(str, date);
+        }
+        catch (Exception e) {}
+    }
+
+    public void wpsCompanionUpdate(String str, Date date)
+    {
+        File outFile = new File(context.getFilesDir().getAbsolutePath() + "/wpspin.html");
+
+        try
+        {
+            OutputStream out = new FileOutputStream(outFile);
+            str = str.replace("a.filter((n) => b.includes(n));", "a;");
+            byte[] data = str.getBytes(Charset.forName("UTF-8"));
+            out.write(data);
+            out.close();
+            outFile.setLastModified(date.getTime());
+        }
+        catch (Exception e) {}
+    }
+
+    public String wpsCompanionGetPath()
+    {
+        if (!wpsCompanionExists())
+            return null;
+
+        return context.getFilesDir().getAbsolutePath() + "/wpspin.html";
+    }
+
+    public Date wpsCompanionGetDate()
+    {
+        File file = new File(context.getFilesDir().getAbsolutePath() + "/wpspin.html");
+        Date date = new Date();
+        date.setTime(file.lastModified());
+        return date;
+    }
+
+    public long wpsCompanionGetSize()
+    {
+        File file = new File(context.getFilesDir().getAbsolutePath() + "/wpspin.html");
+        return file.length();
+    }
+
+    public Boolean wpsCompanionInternal()
+    {
+        Date date;
+        SimpleDateFormat format = new SimpleDateFormat(context.getResources().getString(R.string.DEFAULT_DATE_FORMAT), Locale.US);
+        try {
+            date = format.parse(wpsInternalDate);
+        } catch (Exception e) {
+            date = new Date();
+        }
+        return date.compareTo(wpsCompanionGetDate()) == 0;
+    }
+
+    public String readableFileSize(long size)
+    {
+        if (size <= 0) return "0";
+        final String[] units = new String[] { "B", "KiB", "MiB", "GiB", "TiB" };
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }
