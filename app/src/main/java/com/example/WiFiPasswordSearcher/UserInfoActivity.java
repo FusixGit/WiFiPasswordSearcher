@@ -1,11 +1,14 @@
 package com.example.WiFiPasswordSearcher;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
@@ -93,9 +96,23 @@ public class UserInfoActivity extends Activity {
         txtGroup.setText(Group);
     }
 
-    public void btnUpdateOnClick(View v)
+    private class AsyncWpsUpdater extends AsyncTask<String, Void, String>
     {
-        if (info != null && info.equals("wpspin"))
+        private ProgressDialog pd;
+        private Toast toast;
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pd = new ProgressDialog(UserInfoActivity.this);
+            pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            pd.setMessage("Updating component...");
+            pd.setCanceledOnTouchOutside(false);
+            pd.show();
+        }
+
+        protected String doInBackground(String[] input)
         {
             DefaultHttpClient hc = new DefaultHttpClient();
             ResponseHandler<String> res = new BasicResponseHandler();
@@ -108,6 +125,15 @@ public class UserInfoActivity extends Activity {
             }
             catch (Exception e) {}
 
+            return str;
+        }
+
+        @Override
+        protected void onPostExecute(String str)
+        {
+            String msg;
+            pd.dismiss();
+
             if (str.contains("initAlgos();"))
             {
                 AppVersion updater = new AppVersion(getApplicationContext());
@@ -116,7 +142,26 @@ public class UserInfoActivity extends Activity {
                 txtGroup.setText(updater.readableFileSize(updater.wpsCompanionGetSize()));
                 Button btnRevert = (Button) findViewById(R.id.btnRevert);
                 btnRevert.setEnabled(!updater.wpsCompanionInternal());
+                msg = "Update successful!";
             }
+            else if (str.length() == 0)
+            {
+                msg = "No internet connection";
+            }
+            else
+            {
+                msg = "Update failed";
+            }
+            toast = Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    public void btnUpdateOnClick(View v)
+    {
+        if (info != null && info.equals("wpspin"))
+        {
+            new AsyncWpsUpdater().execute();
         }
     }
 
@@ -129,6 +174,9 @@ public class UserInfoActivity extends Activity {
             txtRegDate.setText(DateFormat.getDateTimeInstance().format(updater.wpsCompanionGetDate()));
             txtGroup.setText(updater.readableFileSize(updater.wpsCompanionGetSize()));
             v.setEnabled(!updater.wpsCompanionInternal());
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Reverted to initial state", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 }
