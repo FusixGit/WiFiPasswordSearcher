@@ -46,6 +46,10 @@ public class WPSActivity extends Activity
     private SQLiteDatabase mDb;
     private volatile boolean wpsReady = false;
 
+    private static final String[] listContextMenuItems = new String[]{
+            "Connect using WPS...",
+            "Copy this WPS PIN"
+    };
 
     public void onCreate(Bundle savedInstanceState) 
     {
@@ -97,16 +101,34 @@ public class WPSActivity extends Activity
             @Override
             public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id)
             {
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(WPSActivity.this);
                 String pin = wpsPin.get(position);
-                Toast.makeText(getApplicationContext(), "Pin \"" + pin + "\" copied", Toast.LENGTH_SHORT).show();
-                try
-                {
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    ClipData dataClip = ClipData.newPlainText("text", pin);
-                    clipboard.setPrimaryClip(dataClip);
-                }
-                catch (Exception e)
-                {}
+                if (pin.length() == 0)
+                    pin = "<empty>";
+                dialogBuilder.setTitle("Selected pin: " + pin);
+                final int fPosition = position;
+
+                dialogBuilder.setItems(listContextMenuItems, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        switch (item) {
+                            case 0:
+                                break;
+                            case 1:
+                                String pin = wpsPin.get(fPosition);
+                                Toast.makeText(getApplicationContext(), "Pin \"" + pin + "\" copied", Toast.LENGTH_SHORT).show();
+                                try
+                                {
+                                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                                    ClipData dataClip = ClipData.newPlainText("text", pin);
+                                    clipboard.setPrimaryClip(dataClip);
+                                }
+                                catch (Exception e) {}
+                                break;
+                        }
+                    }
+                });
+
+                dialogBuilder.show();
             }
         });
 
