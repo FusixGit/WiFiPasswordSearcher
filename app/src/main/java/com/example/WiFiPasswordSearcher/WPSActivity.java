@@ -483,8 +483,8 @@ public class WPSActivity extends Activity
             if (msg.length() > 0)
             {
                 data.add(new ItemWps(null, msg, null, null));
-                wpslist.setEnabled(false);
             }
+            wpslist.setEnabled(msg.length() == 0);
 
             wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
             if (toast) toastMessage("Selected source: 3WiFi Online WPS PIN");
@@ -601,6 +601,7 @@ public class WPSActivity extends Activity
                     ""
             ));
         }
+        wpslist.setEnabled(pins.size() > 0);
         wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
         toastMessage("Selected source: WPS PIN Companion");
     }
@@ -704,14 +705,15 @@ public class WPSActivity extends Activity
             }
             while(cursor.moveToNext());
             cursor.close();
+            wpslist.setEnabled(true);
         }
         catch (Exception e)
         {
             data.add(new ItemWps(null, "No pins found", null, null));
+            wpslist.setEnabled(false);
         }
         wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
 
-        wpslist.setEnabled(true);
         toastMessage("Selected source: WPA WPS TESTER");
     }
 
