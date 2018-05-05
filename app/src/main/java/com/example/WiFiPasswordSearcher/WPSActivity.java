@@ -52,7 +52,7 @@ public class WPSActivity extends Activity
     private volatile boolean wpsReady = false;
 
     private static final String[] listContextMenuItems = new String[]{
-            "Connect using WPS...",
+            "Connect using WPS... (without root)",
             "Copy this WPS PIN"
     };
 
@@ -148,8 +148,9 @@ public class WPSActivity extends Activity
                     String title = "An error occurred";
                     String errorMessage;
                     switch (reason) {
-                        case 0: // Unsupported WPS method
-                            errorMessage = "This network does not support WPS PIN method.";
+                        case 0: // Generic failure
+                            title = "WPS connection failed";
+                            errorMessage = "Root privileges are required to connect with <empty> pin.";
                             break;
                         case 1: // In progress
                             errorMessage = "Operation currently in progress.";
