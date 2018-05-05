@@ -40,8 +40,8 @@ public class ServerSettingsActivity extends Activity
         mSettings.Reload();
 
         String SERVER_LOGIN = mSettings.AppSettings.getString(Settings.APP_SERVER_LOGIN, "");
-        String SERVER_PASSWORD = mSettings.AppSettings.getString(Settings.APP_SERVER_PASSWORD, "antichat");
-        String SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, "http://3wifi.stascorp.com");
+        String SERVER_PASSWORD = mSettings.AppSettings.getString(Settings.APP_SERVER_PASSWORD, "");
+        String SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, getResources().getString(R.string.SERVER_URI_DEFAULT));
         Boolean CHECK_UPDATES =  mSettings.AppSettings.getBoolean(Settings.APP_CHECK_UPDATES, true);
 
         txtServerLogin.setText(SERVER_LOGIN);

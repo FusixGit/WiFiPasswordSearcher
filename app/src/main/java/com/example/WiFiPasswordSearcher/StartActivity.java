@@ -56,7 +56,7 @@ public class StartActivity extends Activity {
         btnStart = (Button)findViewById(R.id.btnStart);
         btnUserInfo = (Button)findViewById(R.id.btnUserInfo);
 
-        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, "http://3wifi.stascorp.com");
+        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, getResources().getString(R.string.SERVER_URI_DEFAULT));
         Boolean API_KEYS_VALID = mSettings.AppSettings.getBoolean(Settings.API_KEYS_VALID, false);
         String SavedLogin = mSettings.AppSettings.getString(Settings.APP_SERVER_LOGIN, "");
         String SavedPassword = mSettings.AppSettings.getString(Settings.APP_SERVER_PASSWORD, "");

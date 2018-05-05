@@ -707,8 +707,8 @@ public class MyActivity extends Activity {
         User = new UserManager(getApplicationContext());
 
         SERVER_LOGIN = mSettings.AppSettings.getString(Settings.APP_SERVER_LOGIN, "");
-        SERVER_PASSWORD = mSettings.AppSettings.getString(Settings.APP_SERVER_PASSWORD, "antichat");
-        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, "http://3wifi.stascorp.com");
+        SERVER_PASSWORD = mSettings.AppSettings.getString(Settings.APP_SERVER_PASSWORD, "");
+        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, getResources().getString(R.string.SERVER_URI_DEFAULT));
         API_READ_KEY = mSettings.AppSettings.getString(Settings.API_READ_KEY, "");
         API_WRITE_KEY = mSettings.AppSettings.getString(Settings.API_WRITE_KEY, "");
         API_KEYS_VALID = mSettings.AppSettings.getBoolean(Settings.API_KEYS_VALID, false);
