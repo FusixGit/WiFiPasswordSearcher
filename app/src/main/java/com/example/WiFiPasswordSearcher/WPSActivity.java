@@ -5,12 +5,14 @@ import android.content.*;
 import android.database.*;
 import android.database.sqlite.*;
 import android.graphics.*;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WpsCallback;
+import android.net.wifi.WpsInfo;
 import android.os.*;
 import android.view.*;
 import android.webkit.*;
 import android.widget.*;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
@@ -29,11 +31,14 @@ class WPSPin
 public class WPSActivity extends Activity
 {
     private WebView mWebView;
+    private WifiManager WifiMgr;
 
     ArrayList<ItemWps> data = new ArrayList<ItemWps>();
     ArrayList<WPSPin> pins = new ArrayList<WPSPin>();
     ProgressDialog pd = null;
     private Settings mSettings;
+    private WpsCallback wpsCallback;
+    private Boolean wpsConnecting = false;
     public static String SERVER_URI = "";
     public static String API_READ_KEY = "";
 
@@ -95,6 +100,102 @@ public class WPSActivity extends Activity
         final String BSSDWps = getIntent().getExtras().getString("variable1");
         BSSDWpsText.setText(BSSDWps); // BSSID
 
+        WifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wpsCallback = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            wpsCallback = new WpsCallback()
+            {
+                @Override
+                public void onStarted(String pin) {
+                    wpsConnecting = true;
+                    pd = new ProgressDialog(WPSActivity.this);
+                    pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    pd.setMessage("Connecting to the network...");
+                    pd.setCanceledOnTouchOutside(false);
+                    pd.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                            {
+                                WifiMgr.cancelWps(wpsCallback);
+                            }
+                            wpsConnecting = false;
+                            dialog.dismiss();
+                            Toast.makeText(getApplicationContext(), "Connection cancelled", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    pd.show();
+                }
+
+                @Override
+                public void onSucceeded() {
+                    if (!wpsConnecting)
+                        return;
+                    wpsConnecting = false;
+                    pd.dismiss();
+                    Toast.makeText(getApplicationContext(), "Connected successfully!", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailed(int reason) {
+                    if (!wpsConnecting && reason > 2)
+                        return;
+                    wpsConnecting = false;
+                    pd.dismiss();
+                    String title = "An error occurred";
+                    String errorMessage;
+                    switch (reason) {
+                        case 0: // Unsupported WPS method
+                            errorMessage = "This network does not support WPS PIN method.";
+                            break;
+                        case 1: // In progress
+                            errorMessage = "Operation currently in progress.";
+                            break;
+                        case 2: // Busy
+                            errorMessage = "Wi-Fi interface is busy.";
+                            break;
+                        case WifiManager.WPS_OVERLAP_ERROR:
+                            errorMessage = "Another WPS transaction is in progress.";
+                            break;
+                        case WifiManager.WPS_WEP_PROHIBITED:
+                            errorMessage = "WEP encryption prohibited.";
+                            break;
+                        case WifiManager.WPS_TKIP_ONLY_PROHIBITED:
+                            errorMessage = "TKIP-only encryption prohibited.";
+                            break;
+                        case WifiManager.WPS_AUTH_FAILURE:
+                            errorMessage = "Selected WPS PIN is not correct.";
+                            break;
+                        case WifiManager.WPS_TIMED_OUT:
+                            title = "WPS connection timeout";
+                            errorMessage = "The network did not respond " +
+                                    "due to low signal or some other reasons. " +
+                                    "You may try again.";
+                            break;
+                        default:
+                            title = "OH SHI*";
+                            errorMessage = "Unknown error " + reason;
+                            break;
+                    }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(WPSActivity.this);
+                    builder.setTitle(title)
+                            .setMessage(errorMessage)
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            };
+        }
+
         ListView wpslist = (ListView)findViewById(R.id.WPSlist);
         wpslist.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
@@ -112,6 +213,36 @@ public class WPSActivity extends Activity
                     public void onClick(DialogInterface dialog, int item) {
                         switch (item) {
                             case 0:
+                                if (!WifiMgr.isWifiEnabled())
+                                {
+                                    Toast toast = Toast.makeText(getApplicationContext(),
+                                            "Wi-Fi interface is disabled", Toast.LENGTH_SHORT);
+                                    toast.show();
+                                    break;
+                                }
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    WpsInfo wpsInfo = new WpsInfo();
+                                    wpsInfo.BSSID = BSSDWps;
+                                    wpsInfo.pin = wpsPin.get(fPosition);
+                                    wpsInfo.setup = WpsInfo.KEYPAD;
+
+                                    WifiMgr.startWps(wpsInfo, wpsCallback);
+                                }
+                                else
+                                {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(WPSActivity.this);
+                                    builder.setTitle("Unsupported Android version")
+                                            .setMessage("This function requires Android 5.0 (Lollipop) with API 21 or higher. Please upgrade your system.")
+                                            .setCancelable(false)
+                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                    AlertDialog alert = builder.create();
+                                    alert.show();
+                                }
                                 break;
                             case 1:
                                 String pin = wpsPin.get(fPosition);
