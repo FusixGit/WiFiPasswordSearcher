@@ -12,6 +12,8 @@
 		android:orientation="vertical"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:layout_marginLeft="5dp"
+		android:layout_marginRight="5dp"
 		android:gravity="center_horizontal">
 
 		<ImageView
@@ -31,29 +33,32 @@
 
 	<LinearLayout
 		android:orientation="vertical"
-		android:layout_width="wrap_content"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:gravity="center_horizontal">
+		android:gravity="center_horizontal"
+		android:paddingLeft="10dp"
+		android:paddingRight="10dp">
 
 		<LinearLayout
 			android:orientation="horizontal"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:weightSum="1">
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
 
 			<TextView
-				android:layout_width="wrap_content"
+				android:layout_width="110dp"
 				android:layout_height="wrap_content"
+				android:layout_gravity="left"
+				android:layout_marginRight="8dp"
 				android:gravity="right"
 				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:maxLines="1"
 				android:text="Username:"
-				android:id="@+id/txtLogin"
-				android:layout_weight="1.00"/>
+				android:id="@+id/txtLogin"/>
 
 			<EditText
-				android:layout_width="240dp"
+				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginLeft="12dp"
+				android:layout_gravity="right"
 				android:id="@+id/edtLogin"
 				android:inputType="textNoSuggestions"
 				android:maxLines="1"
@@ -63,23 +68,24 @@
 
 		<LinearLayout
 			android:orientation="horizontal"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:weightSum="1">
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
 
 			<TextView
-				android:layout_width="wrap_content"
+				android:layout_width="110dp"
 				android:layout_height="wrap_content"
+				android:layout_gravity="left"
+				android:layout_marginRight="8dp"
 				android:gravity="right"
 				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:maxLines="1"
 				android:text="Password:"
-				android:id="@+id/txtPassword"
-				android:layout_weight="1.00"/>
+				android:id="@+id/txtPassword"/>
 
 			<EditText
-				android:layout_width="240dp"
+				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginLeft="12dp"
+				android:layout_gravity="right"
 				android:id="@+id/edtPassword"
 				android:inputType="textNoSuggestions"
 				android:password="true"
@@ -122,7 +128,7 @@
 			<Button
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="User info"
+				android:text="User Info"
 				android:id="@+id/btnUserInfo"
 				android:layout_weight="0.15"/>
 
