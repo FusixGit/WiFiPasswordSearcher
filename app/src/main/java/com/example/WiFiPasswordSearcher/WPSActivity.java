@@ -49,6 +49,7 @@ public class WPSActivity extends Activity
     private DatabaseHelper mDBHelper;
     private SQLiteDatabase mDb;
     private volatile boolean wpsReady = false;
+    private String cachedPins = "";
 
     private static final String[] listContextMenuItems = new String[]{
             "Connect using WPS... (without root)",
@@ -390,7 +391,10 @@ public class WPSActivity extends Activity
             HttpGet http = new HttpGet(SERVER_URI + "/api/apiwps?key=" + API_READ_KEY + "&bssid=" + BSSID);
             try
             {
-                response = hc.execute(http, res);
+                if (cachedPins.isEmpty())
+                    response = hc.execute(http, res);
+                else
+                    response = cachedPins;
 
                 try
                 {
@@ -399,6 +403,7 @@ public class WPSActivity extends Activity
 
                     if (result)
                     {
+                        cachedPins = response;
                         try
                         {
                             jObject = jObject.getJSONObject("data");
