@@ -304,9 +304,6 @@ public class MyActivity extends Activity {
     private UserManager User;
 
     public static String APP_VERSION = "";
-    public static String SERVER_LOGIN = "";
-    public static String SERVER_PASSWORD = "";
-    public static String SERVER_URI = "";
     public static String API_READ_KEY = "";
     public static String API_WRITE_KEY = "";
     public static Boolean API_KEYS_VALID = false;
@@ -706,9 +703,6 @@ public class MyActivity extends Activity {
         mSettings = new Settings(getApplicationContext());
         User = new UserManager(getApplicationContext());
 
-        SERVER_LOGIN = mSettings.AppSettings.getString(Settings.APP_SERVER_LOGIN, "");
-        SERVER_PASSWORD = mSettings.AppSettings.getString(Settings.APP_SERVER_PASSWORD, "");
-        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, getResources().getString(R.string.SERVER_URI_DEFAULT));
         API_READ_KEY = mSettings.AppSettings.getString(Settings.API_READ_KEY, "");
         API_WRITE_KEY = mSettings.AppSettings.getString(Settings.API_WRITE_KEY, "");
         API_KEYS_VALID = mSettings.AppSettings.getBoolean(Settings.API_KEYS_VALID, false);
@@ -893,6 +887,8 @@ public class MyActivity extends Activity {
             }
             query.put("bssid", bssids);
 
+            mSettings.Reload();
+            String SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, getResources().getString(R.string.SERVER_URI_DEFAULT));
             URL Uri = new URL(SERVER_URI + "/api/apiquery");
 
             HttpURLConnection Connection = (HttpURLConnection) Uri.openConnection();

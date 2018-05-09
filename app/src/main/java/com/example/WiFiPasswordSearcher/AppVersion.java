@@ -29,11 +29,11 @@ import java.util.Locale;
 public class AppVersion
 {
     private Context context;
-    private String SERVER_URI;
     private Float ActualyVersion;
     private String WhatNews;
     private Boolean LoadSuccesses = false;
     private String wpsInternalDate = "2018-04-29 23:30:29";
+    private Settings mSettings;
 
     public AppVersion(Context _context)
     {
@@ -41,8 +41,7 @@ public class AppVersion
         ActualyVersion = 0f;
         WhatNews = "";
 
-        Settings mSettings = new Settings(context);
-        SERVER_URI = mSettings.AppSettings.getString(mSettings.APP_SERVER_URI, context.getResources().getString(R.string.SERVER_URI_DEFAULT));
+        mSettings = new Settings(context);
     }
 
     public void ShowUpdateDialog(Activity activity)
@@ -54,7 +53,9 @@ public class AppVersion
         ad.setCancelable(false);
         ad.setPositiveButton("Download", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int arg1) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(context.getResources().getString(R.string.SERVER_URI_DEFAULT) + "/api/app.latest.apk"));
+                mSettings.Reload();
+                String SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, context.getResources().getString(R.string.SERVER_URI_DEFAULT));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SERVER_URI + "/api/app.latest.apk"));
                 browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(browserIntent);
             }
@@ -76,6 +77,8 @@ public class AppVersion
         String RawData = "";
 
         try {
+            mSettings.Reload();
+            String SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, context.getResources().getString(R.string.SERVER_URI_DEFAULT));
             URL Uri = new URL(SERVER_URI + Args);
 
             HttpURLConnection Connection = (HttpURLConnection) Uri.openConnection();

@@ -39,7 +39,6 @@ public class WPSActivity extends Activity
     private Settings mSettings;
     private WpsCallback wpsCallback;
     private Boolean wpsConnecting = false;
-    public static String SERVER_URI = "";
     public static String API_READ_KEY = "";
 
     ArrayList<String> wpsPin = new ArrayList<String>();
@@ -87,7 +86,6 @@ public class WPSActivity extends Activity
         }
         mSettings = new Settings(getApplicationContext());
 
-        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, "http://3wifi.stascorp.com");
         API_READ_KEY = mSettings.AppSettings.getString(Settings.API_READ_KEY, "");
 
         ActionBar actionBar = getActionBar();
@@ -387,6 +385,8 @@ public class WPSActivity extends Activity
             DefaultHttpClient hc = new DefaultHttpClient();
             ResponseHandler<String> res = new BasicResponseHandler();
 
+            mSettings.Reload();
+            String SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, getResources().getString(R.string.SERVER_URI_DEFAULT));
             HttpGet http = new HttpGet(SERVER_URI + "/api/apiwps?key=" + API_READ_KEY + "&bssid=" + BSSID);
             try
             {

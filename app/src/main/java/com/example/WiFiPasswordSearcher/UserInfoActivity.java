@@ -29,14 +29,12 @@ public class UserInfoActivity extends Activity {
     public TextView txtRegDate = null;
     public TextView txtGroup = null;
     private String info;
-    public static String SERVER_URI = "";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user);
 
         Settings mSettings = new Settings(getApplicationContext());
-        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, "http://3wifi.stascorp.com");
 
         try {
             info = getIntent().getExtras().getString("showInfo");
@@ -117,6 +115,9 @@ public class UserInfoActivity extends Activity {
             DefaultHttpClient hc = new DefaultHttpClient();
             ResponseHandler<String> res = new BasicResponseHandler();
 
+            Settings mSettings = new Settings(getApplicationContext());
+            mSettings.Reload();
+            String SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, getResources().getString(R.string.SERVER_URI_DEFAULT));
             HttpGet http = new HttpGet(SERVER_URI + "/wpspin");
             String str = "";
             try

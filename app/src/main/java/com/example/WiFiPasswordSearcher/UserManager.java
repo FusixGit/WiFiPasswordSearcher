@@ -16,7 +16,6 @@ import java.net.URL;
 public class UserManager {
     private Settings mSettings = null;
     private String APP_VERSION = "";
-    private String SERVER_URI = "";
     private String API_READ_KEY = "";
 
     public String Login = "";
@@ -27,7 +26,6 @@ public class UserManager {
     UserManager(Context context) {
         APP_VERSION = context.getResources().getString(R.string.app_version);
         mSettings = new Settings(context);
-        SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, context.getResources().getString(R.string.SERVER_URI_DEFAULT));
         API_READ_KEY = mSettings.AppSettings.getString(Settings.API_READ_KEY, "");
         Login = mSettings.AppSettings.getString(Settings.APP_SERVER_LOGIN, "");
     }
