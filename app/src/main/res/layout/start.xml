@@ -47,7 +47,7 @@
 			<TextView
 				android:layout_width="110dp"
 				android:layout_height="wrap_content"
-				android:layout_gravity="left"
+				android:layout_gravity="left|center_vertical"
 				android:layout_marginRight="8dp"
 				android:gravity="right"
 				android:textAppearance="?android:attr/textAppearanceLarge"
@@ -74,7 +74,7 @@
 			<TextView
 				android:layout_width="110dp"
 				android:layout_height="wrap_content"
-				android:layout_gravity="left"
+				android:layout_gravity="left|center_vertical"
 				android:layout_marginRight="8dp"
 				android:gravity="right"
 				android:textAppearance="?android:attr/textAppearanceLarge"
