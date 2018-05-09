@@ -17,6 +17,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="50dp"
 			android:text="Refresh"
+			android:maxLines="1"
 			android:id="@+id/btnRefresh"
 			android:onClick="btnRefreshOnClick"
 			android:layout_weight="1.0"/>
@@ -25,6 +26,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="50dp"
 			android:text="3WiFi"
+			android:maxLines="1"
 			android:enabled="false"
 			android:id="@+id/btnCheckFromBase"
 			android:layout_gravity="center_horizontal"
