@@ -29,6 +29,7 @@ public class WifiDetails extends Activity
     private WifiManager WifiMgr;
 
     private String NetworkBSSID;
+    private String NetworkESSID;
     private TextView txtBSSID;
     private TextView txtESSID;
     private TextView txtFreq;
@@ -38,7 +39,7 @@ public class WifiDetails extends Activity
     private boolean ScanThreadActive;
     private boolean UseWifiDetector;
     private int LastSignal;
-    private int LastFreq;
+    private int LastFreq = -1;
     private String LastBSSID;
     private String LastESSID;
     private Settings mSettings;
@@ -57,6 +58,7 @@ public class WifiDetails extends Activity
         UseWifiDetector = false;
         HashMap<String, String> StartWifiInfo = (HashMap<String, String>)(getIntent().getSerializableExtra("WifiInfo"));
         NetworkBSSID = StartWifiInfo.get("BSSID");
+        NetworkESSID = StartWifiInfo.get("SSID");
 
         txtBSSID = (TextView)this.findViewById(R.id.txtDetailsBSSID);
         txtESSID = (TextView)this.findViewById(R.id.txtDetailsESSID);
@@ -191,9 +193,26 @@ public class WifiDetails extends Activity
             Boolean Founded = false;
             WifiMgr.startScan();
             results = WifiMgr.getScanResults();
+            boolean match;
 
             for (ScanResult result : results) {
-                if (result.BSSID.equals(NetworkBSSID)) {
+                if (!NetworkBSSID.isEmpty() && !NetworkESSID.isEmpty())
+                {
+                    match = (result.BSSID.equals(NetworkBSSID) && result.SSID.equals(NetworkESSID));
+                }
+                else if (NetworkBSSID.isEmpty() && !NetworkESSID.isEmpty())
+                {
+                    match = result.SSID.equals(NetworkESSID);
+                }
+                else if (!NetworkBSSID.isEmpty() && NetworkESSID.isEmpty())
+                {
+                    match = result.BSSID.equals(NetworkBSSID);
+                }
+                else
+                {
+                    match = true;
+                }
+                if (match) {
                     WiFiInfo = result;
                     Update();
                     Founded = true;
@@ -213,7 +232,7 @@ public class WifiDetails extends Activity
         BSSID = BSSID.toUpperCase();
         if (BSSID.equals(LastBSSID)) return;
 
-        final String text = "BSSID: " + BSSID;
+        final String text = "BSSID: " + (BSSID.isEmpty() ? "Unknown" : BSSID);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -224,14 +243,15 @@ public class WifiDetails extends Activity
         LastBSSID = BSSID;
     }
 
-    private void setESSID(final String ESSID)
+    private void setESSID(String ESSID)
     {
         if (ESSID.equals(LastESSID)) return;
+        final String text = (ESSID.isEmpty() ? "<unknown>" : ESSID);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                txtESSID.setText(ESSID);
+                txtESSID.setText(text);
             }
         });
         LastESSID = ESSID;
@@ -239,43 +259,42 @@ public class WifiDetails extends Activity
 
     private void setFreq(String Freq)
     {
-        String sDiap;
+        String sDiap = "";
         int Channel = 0;
 
         int iFreq = Integer.parseInt(Freq);
-        if(iFreq == LastFreq) return;
+        if (iFreq == LastFreq) return;
 
-        if(iFreq >= 2401 && iFreq <= 2483)
+        if (iFreq > 0)
         {
-            sDiap = "2.4 GHz";
-            Channel = ((iFreq-2412)/5)+1;
-        }
-        else if(iFreq >= 5150 && iFreq <= 5250)
-        {
-            sDiap = "UNII 1";
-            Channel = (5000+iFreq)/5;
-        }
-        else if(iFreq >= 5250 && iFreq <= 5350)
-        {
-            sDiap = "UNII 2";
-            Channel = (5000+iFreq)/5;
-        }
-        else if(iFreq >= 5470 && iFreq <= 5725)
-        {
-            sDiap = "UNII 2 Extended";
-            Channel = (iFreq/5)+1;
-        }
-        else if(iFreq >= 5725  && iFreq <= 5825)
-        {
-            sDiap = "UNII 3";
-            Channel = (5000+iFreq)/5;
-        }
-        else
-        {
-            sDiap = "";
+            if (iFreq >= 2401 && iFreq <= 2483)
+            {
+                sDiap = "2.4 GHz";
+                Channel = ((iFreq - 2412) / 5) + 1;
+            }
+            else if (iFreq >= 5150 && iFreq <= 5250)
+            {
+                sDiap = "UNII 1";
+                Channel = (5000 + iFreq) / 5;
+            }
+            else if (iFreq >= 5250 && iFreq <= 5350)
+            {
+                sDiap = "UNII 2";
+                Channel = (5000 + iFreq) / 5;
+            }
+            else if (iFreq >= 5470 && iFreq <= 5725)
+            {
+                sDiap = "UNII 2 Extended";
+                Channel = (iFreq / 5) + 1;
+            }
+            else if (iFreq >= 5725  && iFreq <= 5825)
+            {
+                sDiap = "UNII 3";
+                Channel = (5000 + iFreq) / 5;
+            }
         }
 
-        final String sText = "Freq: " + Freq + " MHz " + "( " + sDiap + " )";
+        final String sText = "Freq: " + (iFreq <= 0 ? "Unknown" : Freq + " MHz " + "(" + sDiap + ")");
 
         runOnUiThread(new Runnable() {
             @Override
@@ -301,7 +320,7 @@ public class WifiDetails extends Activity
             public void run() {
                 graphSeries.appendData(new DataPoint(iGraphPointCount, fSignal), true, 25);
                 iGraphPointCount++;
-                txtChannel.setText("Signal: " + fSignal + "%");
+                txtSignal.setText("Signal: " + fSignal + "%");
             }
         });
     }
@@ -310,7 +329,7 @@ public class WifiDetails extends Activity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                txtSignal.setText("Channel: " + Channel);
+                txtChannel.setText("Channel: " + (Channel <= 0 ? "N/A" : Channel));
             }
         });
     }
