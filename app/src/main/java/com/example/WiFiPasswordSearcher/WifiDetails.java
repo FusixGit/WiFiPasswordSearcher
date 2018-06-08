@@ -8,7 +8,6 @@ import android.media.SoundPool;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -24,9 +23,7 @@ import java.util.List;
 
 public class WifiDetails extends Activity
 {
-    private HashMap<String, String> StartWifiInfo;
     private ScanResult WiFiInfo;
-    private Thread ScanThread;
     private Thread DetectorThread;
     private SoundPool mSoundPool;
     private WifiManager WifiMgr;
@@ -37,8 +34,6 @@ public class WifiDetails extends Activity
     private TextView txtFreq;
     private TextView txtSignal;
     private TextView txtChannel;
-    private CheckBox chkbUseDetector;
-    private LinearLayout llGrphView;
 
     private boolean ScanThreadActive;
     private boolean UseWifiDetector;
@@ -59,10 +54,8 @@ public class WifiDetails extends Activity
         setContentView(R.layout.wifi_details);
         this.onConfigurationChanged(getResources().getConfiguration());
 
-        HashMap<String, String> WifiInfoIntent;
-
         UseWifiDetector = false;
-        StartWifiInfo = (HashMap<String, String>)(getIntent().getSerializableExtra("WifiInfo"));
+        HashMap<String, String> StartWifiInfo = (HashMap<String, String>)(getIntent().getSerializableExtra("WifiInfo"));
         NetworkBSSID = StartWifiInfo.get("BSSID");
 
         txtBSSID = (TextView)this.findViewById(R.id.txtDetailsBSSID);
@@ -70,8 +63,8 @@ public class WifiDetails extends Activity
         txtFreq = (TextView)this.findViewById(R.id.txtDetailsFreq);
         txtSignal = (TextView)this.findViewById(R.id.txtDetailsSignal);
         txtChannel = (TextView)this.findViewById(R.id.txtDetailsChannel);
-        chkbUseDetector = (CheckBox)this.findViewById(R.id.chkbUseDetector);
-        llGrphView = (LinearLayout)this.findViewById(R.id.llGrphView);
+        CheckBox chkbUseDetector = (CheckBox)this.findViewById(R.id.chkbUseDetector);
+        LinearLayout llGrphView = (LinearLayout)this.findViewById(R.id.llGrphView);
 
         mSoundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
 
@@ -123,7 +116,7 @@ public class WifiDetails extends Activity
 
         WifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        ScanThread = new Thread(new Runnable() {
+        Thread ScanThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 ScanWorker();
@@ -175,13 +168,12 @@ public class WifiDetails extends Activity
     private void DetectorWorker()
     {
         int PickSoundId = mSoundPool.load(getApplicationContext(), R.raw.pick, 1);
-        int SleepTime = 0;
 
         while (UseWifiDetector)
         {
             if (LastSignal > 0)
                 mSoundPool.play(PickSoundId, 1, 1, 100, 0, 1);
-            SleepTime = 2100-(2000/100)*LastSignal;
+            int SleepTime = 2100-(2000/100)*LastSignal;
             try {
                 Thread.sleep((long)SleepTime, 0);
             } catch (InterruptedException e) {
@@ -219,7 +211,7 @@ public class WifiDetails extends Activity
     private void setBSSID(String BSSID)
     {
         BSSID = BSSID.toUpperCase();
-        if(BSSID == LastBSSID) return;
+        if (BSSID.equals(LastBSSID)) return;
 
         final String text = "BSSID: " + BSSID;
 
@@ -234,7 +226,7 @@ public class WifiDetails extends Activity
 
     private void setESSID(final String ESSID)
     {
-        if(ESSID == LastESSID) return;
+        if (ESSID.equals(LastESSID)) return;
 
         runOnUiThread(new Runnable() {
             @Override
@@ -247,7 +239,7 @@ public class WifiDetails extends Activity
 
     private void setFreq(String Freq)
     {
-        String sDiap = "";
+        String sDiap;
         int Channel = 0;
 
         int iFreq = Integer.parseInt(Freq);
@@ -256,7 +248,7 @@ public class WifiDetails extends Activity
         if(iFreq >= 2401 && iFreq <= 2483)
         {
             sDiap = "2.4 GHz";
-            Channel = (int)((iFreq-2412)/5)+1;
+            Channel = ((iFreq-2412)/5)+1;
         }
         else if(iFreq >= 5150 && iFreq <= 5250)
         {
@@ -271,7 +263,7 @@ public class WifiDetails extends Activity
         else if(iFreq >= 5470 && iFreq <= 5725)
         {
             sDiap = "UNII 2 Extended";
-            Channel = (int)(iFreq/5)+1;
+            Channel = (iFreq/5)+1;
         }
         else if(iFreq >= 5725  && iFreq <= 5825)
         {
