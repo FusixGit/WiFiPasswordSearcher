@@ -9,6 +9,7 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WpsCallback;
 import android.net.wifi.WpsInfo;
 import android.os.*;
+import android.text.InputType;
 import android.view.*;
 import android.webkit.*;
 import android.widget.*;
@@ -202,64 +203,7 @@ public class WPSActivity extends Activity
             @Override
             public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id)
             {
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(WPSActivity.this);
-                String pin = wpsPin.get(position);
-                if (pin.length() == 0)
-                    pin = "<empty>";
-                dialogBuilder.setTitle("Selected pin: " + pin);
-                final int fPosition = position;
-
-                dialogBuilder.setItems(listContextMenuItems, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        switch (item) {
-                            case 0:
-                                if (!WifiMgr.isWifiEnabled())
-                                {
-                                    Toast toast = Toast.makeText(getApplicationContext(),
-                                            "Wi-Fi interface is disabled", Toast.LENGTH_SHORT);
-                                    toast.show();
-                                    break;
-                                }
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                                {
-                                    WpsInfo wpsInfo = new WpsInfo();
-                                    wpsInfo.BSSID = BSSDWps;
-                                    wpsInfo.pin = wpsPin.get(fPosition);
-                                    wpsInfo.setup = WpsInfo.KEYPAD;
-
-                                    WifiMgr.startWps(wpsInfo, wpsCallback);
-                                }
-                                else
-                                {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(WPSActivity.this);
-                                    builder.setTitle("Unsupported Android version")
-                                            .setMessage("This function requires Android 5.0 (Lollipop) with API 21 or higher. Please upgrade your system.")
-                                            .setCancelable(false)
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.dismiss();
-                                                }
-                                            });
-                                    AlertDialog alert = builder.create();
-                                    alert.show();
-                                }
-                                break;
-                            case 1:
-                                String pin = wpsPin.get(fPosition);
-                                Toast.makeText(getApplicationContext(), "Pin \"" + pin + "\" copied", Toast.LENGTH_SHORT).show();
-                                try
-                                {
-                                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                                    ClipData dataClip = ClipData.newPlainText("text", pin);
-                                    clipboard.setPrimaryClip(dataClip);
-                                }
-                                catch (Exception e) {}
-                                break;
-                        }
-                    }
-                });
-
-                dialogBuilder.show();
+                ShowMenu(BSSDWps, wpsPin.get(position));
             }
         });
 
@@ -284,6 +228,66 @@ public class WPSActivity extends Activity
         mWebView.loadUrl("file://" + path);
 
         new AsyncInitActivity().execute(BSSDWps);
+    }
+
+    private void ShowMenu(final String BSSID, final String pin)
+    {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(WPSActivity.this);
+        String spin = pin;
+        if (spin.length() == 0)
+            spin = "<empty>";
+        dialogBuilder.setTitle("Selected pin: " + spin);
+
+        dialogBuilder.setItems(listContextMenuItems, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                switch (item) {
+                    case 0:
+                        if (!WifiMgr.isWifiEnabled())
+                        {
+                            Toast toast = Toast.makeText(getApplicationContext(),
+                                    "Wi-Fi interface is disabled", Toast.LENGTH_SHORT);
+                            toast.show();
+                            break;
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        {
+                            WpsInfo wpsInfo = new WpsInfo();
+                            wpsInfo.BSSID = BSSID;
+                            wpsInfo.pin = pin;
+                            wpsInfo.setup = WpsInfo.KEYPAD;
+
+                            WifiMgr.startWps(wpsInfo, wpsCallback);
+                        }
+                        else
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(WPSActivity.this);
+                            builder.setTitle("Unsupported Android version")
+                                    .setMessage("This function requires Android 5.0 (Lollipop) with API 21 or higher. Please upgrade your system.")
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                        }
+                        break;
+                    case 1:
+                        Toast.makeText(getApplicationContext(), "Pin \"" + pin + "\" copied", Toast.LENGTH_SHORT).show();
+                        try
+                        {
+                            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                            ClipData dataClip = ClipData.newPlainText("text", pin);
+                            clipboard.setPrimaryClip(dataClip);
+                        }
+                        catch (Exception e) {}
+                        break;
+                }
+            }
+        });
+
+        dialogBuilder.show();
     }
 
     private class AsyncInitActivity extends AsyncTask <String, Void, String>
@@ -720,6 +724,37 @@ public class WPSActivity extends Activity
         wpslist.setAdapter(new MyAdapterWps(WPSActivity.this, data));
 
         toastMessage("Selected source: WPA WPS TESTER");
+    }
+
+    public void btnCustomPin(View view)
+    {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Enter your WPS PIN:");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        alert.setView(input);
+
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                String BSSDWps = getIntent().getExtras().getString("variable1");
+                String pin = input.getText().toString();
+                ShowMenu(BSSDWps, pin);
+            }
+        });
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.cancel();
+            }
+        });
+
+        alert.show();
     }
 
     //Toast

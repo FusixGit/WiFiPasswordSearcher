@@ -36,6 +36,13 @@
 			android:onClick="btnLocalClick"
 			android:id="@+id/wpsButton2"/>
 
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="50dp"
+			android:text="..."
+			android:maxLines="1"
+			android:onClick="btnCustomPin"/>
+
 	</LinearLayout>
 
 	<WebView
