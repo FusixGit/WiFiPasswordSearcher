@@ -213,6 +213,9 @@ public class WifiDetails extends Activity
                     match = true;
                 }
                 if (match) {
+                    if (NetworkBSSID.isEmpty()) NetworkBSSID = result.BSSID;
+                    if (NetworkESSID.isEmpty()) NetworkESSID = result.SSID;
+
                     WiFiInfo = result;
                     Update();
                     Founded = true;
