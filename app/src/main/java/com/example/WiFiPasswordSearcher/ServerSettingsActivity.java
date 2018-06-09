@@ -1,12 +1,8 @@
 package com.example.WiFiPasswordSearcher;
 
 import android.app.Activity;
-import android.app.LauncherActivity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.InputType;
 import android.view.View;
 import android.widget.*;
 
@@ -84,4 +80,15 @@ public class ServerSettingsActivity extends Activity
             finish();
         }
     };
+
+    public void cbUnmaskClick(View view)
+    {
+        int eType = txtServerPassword.getInputType();
+        if (((CheckBox)view).isChecked()) {
+            txtServerPassword.setInputType(eType & ~InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
+        else {
+            txtServerPassword.setInputType(eType | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
+    }
 }

@@ -33,27 +33,44 @@
 	</LinearLayout>
 
 	<LinearLayout
-		android:orientation="vertical"
-		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 
-		<TextView
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="4dp"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:textColor="#A0A0A0"
+				android:textSize="14dp"
+				android:text="Password"
+				android:id="@+id/lab_settings_3wifi_password"/>
+
+			<EditText
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/txt_settings_3wifi_password"
+				android:inputType="textNoSuggestions"
+				android:singleLine="true"
+				android:password="true"
+				android:layout_weight="1"/>
+
+		</LinearLayout>
+
+		<CheckBox
+			android:layout_gravity="center_vertical"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginLeft="4dp"
-			android:textAppearance="?android:attr/textAppearanceLarge"
-			android:textColor="#A0A0A0"
-			android:textSize="14dp"
-			android:text="Password"
-			android:id="@+id/lab_settings_3wifi_password"/>
-
-		<EditText
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:id="@+id/txt_settings_3wifi_password"
-			android:inputType="textNoSuggestions"
-			android:singleLine="true"
-			android:layout_weight="1"/>
+			android:layout_marginRight="12dp"
+			android:text="Unmask"
+			android:onClick="cbUnmaskClick"/>
 
 	</LinearLayout>
 
