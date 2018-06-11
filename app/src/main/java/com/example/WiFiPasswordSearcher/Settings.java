@@ -13,6 +13,7 @@ public class Settings
     public static final String APP_SERVER_LOGIN = "SERVER_LOGIN";
     public static final String APP_SERVER_PASSWORD = "SERVER_PASSWORD";
     public static final String APP_SERVER_URI = "SERVER_URI";
+    public static final String APP_FETCH_ESS = "FETCH_ESS";
     public static final String APP_CHECK_UPDATES = "CHECK_UPDATES";
     public static final String API_READ_KEY = "READ_KEY";
     public static final String API_WRITE_KEY = "WRITE_KEY";

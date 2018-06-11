@@ -877,17 +877,24 @@ public class MyActivity extends Activity {
         BufferedReader Reader = null;
         String ReadLine = "";
         String RawData = "";
+        Boolean FETCH_ESS;
 
         try {
             JSONObject query = new JSONObject();
             query.put("key", API_READ_KEY);
             JSONArray bssids = new JSONArray();
+            JSONArray essids = new JSONArray();
             for (MyScanResult result : WiFiScanResult) {
                 bssids.put(result.BSSID);
+                essids.put(result.SSID);
             }
-            query.put("bssid", bssids);
-
             mSettings.Reload();
+            FETCH_ESS = mSettings.AppSettings.getBoolean(Settings.APP_FETCH_ESS, false);
+
+            query.put("bssid", bssids);
+            if (FETCH_ESS)
+                query.put("essid", essids);
+
             String SERVER_URI = mSettings.AppSettings.getString(Settings.APP_SERVER_URI, getResources().getString(R.string.SERVER_URI_DEFAULT));
             URL Uri = new URL(SERVER_URI + "/api/apiquery");
 
@@ -986,7 +993,7 @@ public class MyActivity extends Activity {
         String KeyColor;
         int i = 0;
         for (MyScanResult result : WiFiScanResult) {
-            APData apdata = GetWiFiKeyByBSSID(bss, result.SSID, result.BSSID.toUpperCase());
+            APData apdata = GetWiFiKeyByBSSID(bss, FETCH_ESS, result.SSID, result.BSSID.toUpperCase());
 
             ElemWiFi = new HashMap<String, String>();
             ElemWiFi.put("ESSID", result.SSID);
@@ -1036,17 +1043,18 @@ public class MyActivity extends Activity {
         ));
     }
 
-    public APData GetWiFiKeyByBSSID(JSONObject bss, String ESSID, String BSSID)
+    public APData GetWiFiKeyByBSSID(JSONObject bss, Boolean fetchESS, String ESSID, String BSSID)
     {
         ArrayList<String> keys = new ArrayList<String>();
         ArrayList<Boolean> gen = new ArrayList<Boolean>();
         ArrayList<String> wpsPins = new ArrayList<String>();
 
         try {
-            boolean Successes = !bss.isNull(BSSID);
+            String val = (fetchESS ? BSSID + '|' + ESSID : BSSID);
+            boolean Successes = !bss.isNull(val);
             if (Successes)
             {
-                JSONArray rows = bss.getJSONArray(BSSID);
+                JSONArray rows = bss.getJSONArray(val);
 
                 for (int i = 0; i < rows.length(); i++)
                 {
