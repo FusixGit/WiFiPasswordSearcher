@@ -28,6 +28,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -738,6 +740,14 @@ public class MyActivity extends Activity {
 
     public void ScanAndShowWiFi()
     {
+        final Comparator<MyScanResult> comparator = new Comparator<MyScanResult>()
+        {
+            @Override
+            public int compare(MyScanResult lhs, MyScanResult rhs)
+            {
+                return (lhs.level < rhs.level ? 1 : (lhs.level == rhs.level ? 0 : -1));
+            }
+        };
         WiFiScanResult = null;
         adapter = null;
         if (false)
@@ -772,6 +782,7 @@ public class MyActivity extends Activity {
 
                 ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
                 HashMap<String, String> ElemWiFi;
+                Collections.sort(results, comparator);
                 WiFiScanResult = results;
 
                 for (MyScanResult result : results) {
@@ -827,6 +838,7 @@ public class MyActivity extends Activity {
                     sc.capabilities = result.capabilities;
                     results.add(sc);
                 }
+                Collections.sort(results, comparator);
                 WiFiScanResult = results;
 
                 ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
