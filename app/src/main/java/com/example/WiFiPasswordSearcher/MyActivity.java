@@ -1056,6 +1056,16 @@ public class MyActivity extends Activity {
         ));
     }
 
+    public Boolean KeyWPSPairExists(ArrayList<String> keys, ArrayList<String> pins, String key, String pin)
+    {
+        for (int i = 0; i < keys.size(); i++)
+        {
+            if (keys.get(i).equals(key) && pins.get(i).equals(pin))
+                return true;
+        }
+        return false;
+    }
+
     public APData GetWiFiKeyByBSSID(JSONObject bss, Boolean fetchESS, String ESSID, String BSSID)
     {
         ArrayList<String> keys = new ArrayList<>();
@@ -1072,10 +1082,13 @@ public class MyActivity extends Activity {
                 for (int i = 0; i < rows.length(); i++)
                 {
                     JSONObject row = rows.getJSONObject(i);
-                    keys.add(row.getString("key"));
-                    gen.add(false);
+                    String key = row.getString("key");
                     String wps = row.getString("wps");
-                    if (!wps.equals("")) wpsPins.add(wps);
+                    if (KeyWPSPairExists(keys, wpsPins, key, wps))
+                        continue;
+                    keys.add(key);
+                    wpsPins.add(wps);
+                    gen.add(false);
                 }
             }
         }
