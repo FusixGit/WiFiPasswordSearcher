@@ -56,7 +56,7 @@ class WiFiListSimpleAdapter extends SimpleAdapter
 {
     private Context context;
     private List DataList;
-    private static HashMap<String, Drawable> SvgImageCache = new HashMap<String, Drawable>();
+    private static HashMap<String, Drawable> SvgImageCache = new HashMap<>();
 
     public WiFiListSimpleAdapter(Context _context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
         super(_context, data, resource, from, to);
@@ -317,7 +317,7 @@ public class MyActivity extends Activity {
     private Button btnStartGPSLog = null;
     private ImageButton btnSettings = null;
     private static List<MyScanResult> WiFiScanResult = null;
-    public static ArrayList<APData> WiFiKeys = new ArrayList<APData>();
+    public static ArrayList<APData> WiFiKeys = new ArrayList<>();
 
     private static boolean ScanInProcess = false;
     private static BroadcastReceiver ScanWiFiReceiverIntent = null;
@@ -347,7 +347,7 @@ public class MyActivity extends Activity {
         if (WiFiScanResult != null) WiFiScanResult.clear();
 
         Context context = getApplicationContext();
-        ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+        ArrayList<HashMap<String, String>> list = new ArrayList<>();
         SimpleAdapter adapter = new SimpleAdapter(context, list, R.layout.row,
             new String[]{"ESSID", "BSSID"},
             new int[]{R.id.ESSID, R.id.BSSID});
@@ -446,7 +446,7 @@ public class MyActivity extends Activity {
                     {
                         case 0:
                             Intent detailsActivityIntent = new Intent(MyActivity.this, WifiDetails.class);
-                            HashMap<String, String> WifiInfo = new HashMap<String, String>();
+                            HashMap<String, String> WifiInfo = new HashMap<>();
                             WifiInfo.put("BSSID", scanResult.BSSID);
                             WifiInfo.put("SSID", scanResult.SSID);
                             WifiInfo.put("Freq", Integer.toString(scanResult.frequency));
@@ -754,7 +754,7 @@ public class MyActivity extends Activity {
         {
             try
             {
-                List<MyScanResult> results = new ArrayList<MyScanResult>();
+                List<MyScanResult> results = new ArrayList<>();
                 MyScanResult sc;
                 sc = new MyScanResult();
                 sc.BSSID = "00:0E:8F:D3:5E:9C";
@@ -780,13 +780,13 @@ public class MyActivity extends Activity {
                 sc.frequency = 2420;
                 results.add(sc);
 
-                ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+                ArrayList<HashMap<String, String>> list = new ArrayList<>();
                 HashMap<String, String> ElemWiFi;
                 Collections.sort(results, comparator);
                 WiFiScanResult = results;
 
                 for (MyScanResult result : results) {
-                    ElemWiFi = new HashMap<String, String>();
+                    ElemWiFi = new HashMap<>();
                     ElemWiFi.put("ESSID", result.SSID);
                     ElemWiFi.put("BSSID", result.BSSID.toUpperCase());
                     ElemWiFi.put("KEY", "*[color:gray]*[no data]");
@@ -828,7 +828,7 @@ public class MyActivity extends Activity {
             public void onReceive(Context context, Intent intent)
             {
                 List<ScanResult> res = WifiMgr.getScanResults();
-                List<MyScanResult> results = new ArrayList<MyScanResult>();
+                List<MyScanResult> results = new ArrayList<>();
                 for (ScanResult result : res) {
                     MyScanResult sc = new MyScanResult();
                     sc.BSSID = result.BSSID;
@@ -841,11 +841,11 @@ public class MyActivity extends Activity {
                 Collections.sort(results, comparator);
                 WiFiScanResult = results;
 
-                ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+                ArrayList<HashMap<String, String>> list = new ArrayList<>();
                 HashMap<String, String> ElemWiFi;
 
                 for (MyScanResult result : results) {
-                    ElemWiFi = new HashMap<String, String>();
+                    ElemWiFi = new HashMap<>();
                     ElemWiFi.put("ESSID", result.SSID);
                     ElemWiFi.put("BSSID", result.BSSID.toUpperCase());
                     ElemWiFi.put("KEY", "*[color:gray]*[no data]");
@@ -1000,30 +1000,32 @@ public class MyActivity extends Activity {
             return;
         }
 
-        ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+        ArrayList<HashMap<String, String>> list = new ArrayList<>();
         HashMap<String, String> ElemWiFi;
         String KeyColor;
         int i = 0;
         for (MyScanResult result : WiFiScanResult) {
             APData apdata = GetWiFiKeyByBSSID(bss, FETCH_ESS, result.SSID, result.BSSID.toUpperCase());
 
-            ElemWiFi = new HashMap<String, String>();
+            ElemWiFi = new HashMap<>();
             ElemWiFi.put("ESSID", result.SSID);
             ElemWiFi.put("BSSID", result.BSSID.toUpperCase());
             ElemWiFi.put("SIGNAL", getStrSignal(result.level));
 
 
-            if (apdata.Keys.size() < 1) {
+            if (apdata.Keys.size() < 1)
+            {
                 ElemWiFi.put("KEY", "*[color:gray]*[unknown]");
                 ElemWiFi.put("KEYSCOUNT", "*[color:gray]*" + Integer.toString(apdata.Keys.size()));
-
-            } else {
+            }
+            else
+            {
                 KeyColor = (apdata.Generated.get(0) ? "*[color:red]*" : "*[color:green]*");
                 ElemWiFi.put("KEY", KeyColor + apdata.Keys.get(0));
                 ElemWiFi.put("KEYSCOUNT", "*[color:green]*" + Integer.toString(apdata.Keys.size()));
             }
 
-            if (apdata.WPS.size() < 1 || apdata.WPS.get(0).length() == 0)
+            if (apdata.WPS.size() < 1 || apdata.WPS.get(0).isEmpty())
             {
                 ElemWiFi.put("WPS", "*[color:gray]*[unknown]");
             }
@@ -1047,7 +1049,6 @@ public class MyActivity extends Activity {
         runOnUiThread(new Thread(new Runnable() {
             @Override
             public void run() {
-
                 WiFiList.setAdapter(adapter);
                 btnCheckFromBase.setEnabled(true);
             }
@@ -1057,9 +1058,9 @@ public class MyActivity extends Activity {
 
     public APData GetWiFiKeyByBSSID(JSONObject bss, Boolean fetchESS, String ESSID, String BSSID)
     {
-        ArrayList<String> keys = new ArrayList<String>();
-        ArrayList<Boolean> gen = new ArrayList<Boolean>();
-        ArrayList<String> wpsPins = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
+        ArrayList<Boolean> gen = new ArrayList<>();
+        ArrayList<String> wpsPins = new ArrayList<>();
 
         try {
             String val = (fetchESS ? BSSID + '|' + ESSID : BSSID);
@@ -1077,14 +1078,15 @@ public class MyActivity extends Activity {
                     if (!wps.equals("")) wpsPins.add(wps);
                 }
             }
-        } catch (JSONException e) {
+        }
+        catch (JSONException e) {
             e.printStackTrace();
         }
 
         if (keys.size() == 0)
         {
             String PassiveKey = PassiveVulnerabilityTest(ESSID, BSSID);
-            if (PassiveKey.length() != 0)
+            if (!PassiveKey.isEmpty())
             {
                 keys.add(PassiveKey);
                 gen.add(true);
