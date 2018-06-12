@@ -40,6 +40,7 @@ public class WPSActivity extends Activity
     private Settings mSettings;
     private WpsCallback wpsCallback;
     private Boolean wpsConnecting = false;
+    private String wpsLastPin = "";
     public static String API_READ_KEY = "";
 
     ArrayList<String> wpsPin = new ArrayList<String>();
@@ -149,8 +150,13 @@ public class WPSActivity extends Activity
                     String errorMessage;
                     switch (reason) {
                         case 0: // Generic failure
-                            title = "WPS connection failed";
-                            errorMessage = "Root privileges are required to connect with <empty> pin.";
+                            if (wpsLastPin.isEmpty()) {
+                                title = "WPS connection failed";
+                                errorMessage = "Your device does not support entering <empty> pin via WPS. You could try again, or use root mode.";
+                            }
+                            else {
+                                errorMessage = "Generic failure - something went wrong. Try turning your Wi-Fi interface off and on, then try again. If this doesn't help, try restarting your device.";
+                            }
                             break;
                         case 1: // In progress
                             errorMessage = "Operation currently in progress.";
@@ -178,7 +184,7 @@ public class WPSActivity extends Activity
                             break;
                         default:
                             title = "OH SHI*";
-                            errorMessage = "Unknown error " + reason;
+                            errorMessage = "Unexpected error " + reason;
                             break;
                     }
 
@@ -256,6 +262,7 @@ public class WPSActivity extends Activity
                             wpsInfo.pin = pin;
                             wpsInfo.setup = WpsInfo.KEYPAD;
 
+                            wpsLastPin = pin;
                             WifiMgr.startWps(wpsInfo, wpsCallback);
                         }
                         else
